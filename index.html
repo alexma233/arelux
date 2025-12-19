@@ -868,9 +868,40 @@
             const timeData = [];
             const valueData = [];
 
+            // Context for formatting
+            const range = document.getElementById('timeRange')?.value || '24h';
+            const interval = document.getElementById('interval')?.value || 'auto';
+            const longRanges = ['3d', '7d', '15d', '31d'];
+            
+            // Auto-detect if interval is effectively 'day'
+            let isDayInterval = interval === 'day';
+            if (interval === 'auto' && details.length > 1) {
+                const diff = details[1].Timestamp - details[0].Timestamp;
+                // If interval is >= 23 hours (allow some slack), treat as day
+                if (diff >= 82800) isDayInterval = true;
+            }
+            // If auto and range is 31d/15d, it usually defaults to day
+            if (interval === 'auto' && ['15d', '31d'].includes(range)) {
+                // Check if we have few points (e.g. < 32 for 31d), likely day
+                if (details.length <= 32) isDayInterval = true;
+            }
+
             details.forEach(item => {
                 const date = new Date(item.Timestamp * 1000);
-                timeData.push(date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }));
+                let label;
+
+                if (isDayInterval) {
+                    // Show YYYY-MM-DD
+                    label = `${date.getFullYear()}-${(date.getMonth()+1).toString().padStart(2, '0')}-${date.getDate().toString().padStart(2, '0')}`;
+                } else if (longRanges.includes(range)) {
+                    // Show MM-DD HH:mm for long ranges with finer granularity
+                    label = `${(date.getMonth()+1).toString().padStart(2, '0')}-${date.getDate().toString().padStart(2, '0')} ${date.getHours().toString().padStart(2, '0')}:${date.getMinutes().toString().padStart(2, '0')}`;
+                } else {
+                    // Show HH:mm for short ranges
+                    label = `${date.getHours().toString().padStart(2, '0')}:${date.getMinutes().toString().padStart(2, '0')}`;
+                }
+
+                timeData.push(label);
                 valueData.push(item.Value);
             });
 
