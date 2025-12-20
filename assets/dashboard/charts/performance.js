@@ -1,7 +1,9 @@
-import { metricColors, metricLabels, metricsConfig } from '../constants.js';
+import { getMetricLabel, metricColors, metricsConfig } from '../constants.js';
+import { getLocale } from '../i18n.js';
 
 //5.有使用
 export function updatePerformanceSection(charts, results) {
+    const locale = getLocale();
     const chartPerformance = charts.performance;
     const metrics = metricsConfig.performance;
     const series = [];
@@ -17,7 +19,7 @@ export function updatePerformanceSection(charts, results) {
         if (timeData.length === 0) timeData = data.timeData;
 
         series.push({
-            name: metricLabels[metric],
+            name: getMetricLabel(metric, locale),
             type: 'line',
             smooth: true,
             data: data.valueData,
@@ -27,7 +29,7 @@ export function updatePerformanceSection(charts, results) {
 
     const option = {
         tooltip: { trigger: 'axis', formatter: '{b}<br/>{a}: {c} ms' },
-        legend: { data: metrics.map(m => metricLabels[m]), bottom: 0 },
+        legend: { data: metrics.map(m => getMetricLabel(m, locale)), bottom: 0 },
         grid: { left: '3%', right: '4%', bottom: '10%', top: '15%', containLabel: true },
         xAxis: { type: 'category', boundaryGap: false, data: timeData },
         yAxis: { type: 'value', name: 'ms' },

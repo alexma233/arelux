@@ -106,7 +106,7 @@ const metricsConfig = {
     topAnalysis: ['l7Flow_outFlux_country', 'l7Flow_outFlux_province', 'l7Flow_outFlux_statusCode', 'l7Flow_outFlux_domain', 'l7Flow_outFlux_url', 'l7Flow_outFlux_resourceType', 'l7Flow_outFlux_sip', 'l7Flow_outFlux_referers', 'l7Flow_outFlux_ua_device', 'l7Flow_outFlux_ua_browser', 'l7Flow_outFlux_ua_os', 'l7Flow_outFlux_ua', 'l7Flow_request_country', 'l7Flow_request_province', 'l7Flow_request_statusCode', 'l7Flow_request_domain', 'l7Flow_request_url', 'l7Flow_request_resourceType', 'l7Flow_request_sip', 'l7Flow_request_referers', 'l7Flow_request_ua_device', 'l7Flow_request_ua_browser', 'l7Flow_request_ua_os', 'l7Flow_request_ua']
 };
 
-const metricLabels = {
+const metricLabelsZhHans = {
     'l7Flow_flux': '总流量',
     'l7Flow_inFlux': '客户端请求流量',
     'l7Flow_outFlux': '响应流量',
@@ -151,6 +151,57 @@ const metricLabels = {
     'l7Flow_request_ua_os': '操作系统请求数',
     'l7Flow_request_ua': 'User Agent 请求数'
 };
+
+const metricLabelsEnUS = {
+    'l7Flow_flux': 'Total traffic',
+    'l7Flow_inFlux': 'Client request traffic',
+    'l7Flow_outFlux': 'Response traffic',
+    'l7Flow_bandwidth': 'Total bandwidth',
+    'l7Flow_inBandwidth': 'Request bandwidth',
+    'l7Flow_outBandwidth': 'Response bandwidth',
+    'l7Flow_outFlux_hy': 'Origin request traffic',
+    'l7Flow_inFlux_hy': 'Origin response traffic',
+    'l7Flow_outBandwidth_hy': 'Origin request bandwidth',
+    'l7Flow_inBandwidth_hy': 'Origin response bandwidth',
+    'l7Flow_request_hy': 'Origin requests',
+    'l7Flow_request': 'Requests',
+    'l7Flow_avgResponseTime': 'Avg response time',
+    'l7Flow_avgFirstByteResponseTime': 'Avg TTFB',
+    'function_requestCount': 'Edge Functions requests',
+    'function_cpuCostTime': 'Edge Functions CPU time',
+    'ccAcl_interceptNum': 'Precise protection hits',
+    'ccManage_interceptNum': 'Managed rules hits',
+    'ccRate_interceptNum': 'Rate limiting hits',
+    'l7Flow_outFlux_country': 'Traffic by country/region',
+    'l7Flow_outFlux_province': 'Traffic by province',
+    'l7Flow_outFlux_statusCode': 'Traffic by status code',
+    'l7Flow_outFlux_domain': 'Traffic by domain',
+    'l7Flow_outFlux_url': 'Traffic by URL',
+    'l7Flow_outFlux_resourceType': 'Traffic by resource type',
+    'l7Flow_outFlux_sip': 'Traffic by client IP',
+    'l7Flow_outFlux_referers': 'Traffic by referer',
+    'l7Flow_outFlux_ua_device': 'Traffic by device type',
+    'l7Flow_outFlux_ua_browser': 'Traffic by browser',
+    'l7Flow_outFlux_ua_os': 'Traffic by OS',
+    'l7Flow_outFlux_ua': 'Traffic by User Agent',
+    'l7Flow_request_country': 'Requests by country/region',
+    'l7Flow_request_province': 'Requests by province',
+    'l7Flow_request_statusCode': 'Requests by status code',
+    'l7Flow_request_domain': 'Requests by domain',
+    'l7Flow_request_url': 'Requests by URL',
+    'l7Flow_request_resourceType': 'Requests by resource type',
+    'l7Flow_request_sip': 'Requests by client IP',
+    'l7Flow_request_referers': 'Requests by referer',
+    'l7Flow_request_ua_device': 'Requests by device type',
+    'l7Flow_request_ua_browser': 'Requests by browser',
+    'l7Flow_request_ua_os': 'Requests by OS',
+    'l7Flow_request_ua': 'Requests by User Agent'
+};
+
+function getMetricLabel(metric, locale = 'zh-Hans') {
+  if (locale === 'en-US') return metricLabelsEnUS[metric] || metric;
+  return metricLabelsZhHans[metric] || metric;
+}
 
 const metricColors = {
     'l7Flow_flux': '#3b82f6', // blue
@@ -205,6 +256,6 @@ export {
   codeToMapName,
   worldNameMap,
   metricsConfig,
-  metricLabels,
+  getMetricLabel,
   metricColors,
 };

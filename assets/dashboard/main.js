@@ -1,8 +1,16 @@
 
 import { metricsConfig } from './constants.js';
 import { fetchData, processData } from './api.js';
-import { calculateTimeRange, handleTimeRangeChange } from './utils.js';
+import { calculateTimeRange, formatCount, handleTimeRangeChange } from './utils.js';
 import { initCharts, resizeCharts } from './initCharts.js';
+import {
+  applyTranslations,
+  getLocale,
+  initI18n,
+  initLanguageSwitcher,
+  onLocaleChange,
+  t,
+} from './i18n.js';
 import {
   updateBandwidthSection,
   updateEdgeFunctionsSection,
@@ -15,6 +23,15 @@ import {
 } from './charts.js';
 
 let charts = null;
+
+initI18n();
+applyTranslations();
+initLanguageSwitcher('language');
+onLocaleChange(() => {
+  applyTranslations();
+  initLanguageSwitcher('language');
+  globalThis.refreshData?.();
+});
 
 async function fetchZones() {
     try {
@@ -29,7 +46,7 @@ async function fetchZones() {
         // Always add "All Zones" option
         const allOption = document.createElement('option');
         allOption.value = "*";
-        allOption.text = "全部站点";
+        allOption.text = t('zones.all');
         select.appendChild(allOption);
 
         if (result.Zones && result.Zones.length > 0) {
@@ -38,7 +55,7 @@ async function fetchZones() {
                 option.value = zone.ZoneId;
                 let text = zone.ZoneName;
                 if (text === 'default-pages-zone') {
-                    text += ' (Pages站点)';
+                    text += t('zones.pagesSuffix');
                 }
                 option.text = text;
                 select.appendChild(option);
@@ -57,7 +74,7 @@ async function fetchZones() {
         const select = document.getElementById('zoneId');
         // If error, ensure we have at least the default * option
         if (select.options.length === 0 || select.options[0].value !== '*') {
-             select.innerHTML = '<option value="*">获取站点失败 (默认为全部)</option>';
+             select.innerHTML = `<option value="*">${t('zones.loadFailed')}</option>`;
         }
     }
 }
@@ -81,8 +98,8 @@ async function fetchPagesBuildStats() {
 
         if (result.parsedResult) {
             const { dplDailyCount, dplMonthCount } = result.parsedResult;
-            document.getElementById('kpi_pages_daily_build').innerText = dplDailyCount !== undefined ? dplDailyCount : '-';
-            document.getElementById('kpi_pages_monthly_build').innerText = dplMonthCount !== undefined ? dplMonthCount : '-';
+            document.getElementById('kpi_pages_daily_build').innerText = dplDailyCount !== undefined ? dplDailyCount.toLocaleString(getLocale()) : '-';
+            document.getElementById('kpi_pages_monthly_build').innerText = dplMonthCount !== undefined ? dplMonthCount.toLocaleString(getLocale()) : '-';
         } else {
              document.getElementById('kpi_pages_daily_build').innerText = '-';
              document.getElementById('kpi_pages_monthly_build').innerText = '-';
@@ -90,8 +107,8 @@ async function fetchPagesBuildStats() {
 
     } catch (err) {
         console.error("Error fetching pages build stats:", err);
-        document.getElementById('kpi_pages_daily_build').innerText = 'Error';
-        document.getElementById('kpi_pages_monthly_build').innerText = 'Error';
+        document.getElementById('kpi_pages_daily_build').innerText = t('common.error');
+        document.getElementById('kpi_pages_monthly_build').innerText = t('common.error');
     }
 }
 
@@ -118,13 +135,13 @@ async function fetchPagesCloudFunctionStats(startTime, endTime) {
             const { TotalValue, Timestamps, Values } = result.parsedResult;
 
             // Update KPI
-            document.getElementById('kpi_pages_cloud_function_total').innerText = TotalValue !== undefined ? TotalValue : '-';
+            document.getElementById('kpi_pages_cloud_function_total').innerText = TotalValue !== undefined ? formatCount(TotalValue) : '-';
 
             // Update Chart
             if (Timestamps && Values && Timestamps.length > 0) {
                  const dates = Timestamps.map(ts => {
                     // Timestamps are in seconds, convert to local string
-                    return new Date(ts * 1000).toLocaleString('zh-CN', { month: 'numeric', day: 'numeric', hour: 'numeric', minute: 'numeric' });
+                    return new Date(ts * 1000).toLocaleString(getLocale(), { month: 'numeric', day: 'numeric', hour: 'numeric', minute: 'numeric' });
                 });
 
                 const option = {
@@ -147,7 +164,7 @@ async function fetchPagesCloudFunctionStats(startTime, endTime) {
                     },
                     series: [
                         {
-                            name: 'Requests',
+                            name: t('charts.requests'),
                             type: 'line',
                             smooth: true,
                             data: Values,
@@ -171,7 +188,7 @@ async function fetchPagesCloudFunctionStats(startTime, endTime) {
         }
     } catch (err) {
         console.error("Error fetching pages cloud function stats:", err);
-        document.getElementById('kpi_pages_cloud_function_total').innerText = 'Error';
+        document.getElementById('kpi_pages_cloud_function_total').innerText = t('common.error');
         charts.pagesCloudFunctionRequests.clear();
     }
 }
@@ -191,7 +208,7 @@ async function fetchPagesCloudFunctionMonthlyStats() {
             const { TotalMemDuration, TotalInvocation } = result.parsedResult;
 
             // Update Requests KPI
-            document.getElementById('kpi_pages_monthly_cf_requests').innerText = TotalInvocation !== undefined ? TotalInvocation : '-';
+            document.getElementById('kpi_pages_monthly_cf_requests').innerText = TotalInvocation !== undefined ? formatCount(TotalInvocation) : '-';
 
             // Update GBs KPI (TotalMemDuration / 1024)
             if (TotalMemDuration !== undefined) {
@@ -207,15 +224,15 @@ async function fetchPagesCloudFunctionMonthlyStats() {
         }
     } catch (err) {
         console.error("Error fetching pages cloud function monthly stats:", err);
-        document.getElementById('kpi_pages_monthly_cf_requests').innerText = 'Error';
-        document.getElementById('kpi_pages_monthly_cf_gbs').innerText = 'Error';
+        document.getElementById('kpi_pages_monthly_cf_requests').innerText = t('common.error');
+        document.getElementById('kpi_pages_monthly_cf_gbs').innerText = t('common.error');
     }
 }
 
 export async function refreshData() {
     if (!charts) return;
     // Show loading
-    document.querySelectorAll('[id^="kpi_"]').forEach(el => el.innerText = '加载中...');
+    document.querySelectorAll('[id^="kpi_"]').forEach(el => el.innerText = t('common.loading'));
 
     // Check time range for Security Metrics
     const { startTime, endTime } = calculateTimeRange();

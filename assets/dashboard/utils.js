@@ -1,3 +1,5 @@
+import { getLocale, t } from './i18n.js';
+
 function formatDate(date) {
     return date.toISOString().slice(0, 19) + 'Z';
 }
@@ -53,7 +55,7 @@ function calculateTimeRange() {
             const errorEl = document.getElementById('timeRangeError');
 
             if (totalMs > maxMs) {
-                if (errorEl) errorEl.innerText = '自定义时间范围不能超过 31 天，已自动为您调整为 31 天。';
+                if (errorEl) errorEl.innerText = t('errors.customRangeTooLarge');
                 totalMs = maxMs;
             } else {
                 if (errorEl) errorEl.innerText = '';
@@ -96,14 +98,27 @@ function formatBps(bps) {
 }
 
 function formatCount(num) {
+    const locale = getLocale();
     if (num === 0) return '0';
     if (num < 1000) return num.toString();
-    if (num < 10000) return (num / 1000).toFixed(2) + ' 千';
-    if (num < 100000000) return (num / 10000).toFixed(2) + ' 万';
-    return (num / 100000000).toFixed(2) + ' 亿';
+    try {
+        return new Intl.NumberFormat(locale, { notation: 'compact', maximumFractionDigits: 2 }).format(num);
+    } catch {
+        // Fallback: English-ish abbreviations
+        if (num < 1_000_000) return (num / 1_000).toFixed(2) + 'K';
+        if (num < 1_000_000_000) return (num / 1_000_000).toFixed(2) + 'M';
+        return (num / 1_000_000_000).toFixed(2) + 'B';
+    }
 }
 
 function getBestCountUnit(maxValue) {
+    const locale = getLocale();
+    if (locale === 'en-US') {
+        if (maxValue < 1_000) return { unit: t('units.requests'), divisor: 1 };
+        if (maxValue < 1_000_000) return { unit: `K ${t('units.requests')}`, divisor: 1_000 };
+        if (maxValue < 1_000_000_000) return { unit: `M ${t('units.requests')}`, divisor: 1_000_000 };
+        return { unit: `B ${t('units.requests')}`, divisor: 1_000_000_000 };
+    }
     if (maxValue < 1000) return { unit: '次', divisor: 1 };
     if (maxValue < 10000) return { unit: '千次', divisor: 1000 };
     if (maxValue < 100000000) return { unit: '万次', divisor: 10000 };
