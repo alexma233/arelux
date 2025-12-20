@@ -24,6 +24,41 @@ import {
 
 let charts = null;
 let worldMapReadyPromise = null;
+const THEME_EVENT_NAME = 'eo:themechange';
+
+function getEchartsTheme() {
+  return document.documentElement.classList.contains('dark') ? 'dark' : null;
+}
+
+function disposeCharts(nextCharts) {
+  if (!nextCharts) return;
+  for (const chart of Object.values(nextCharts)) {
+    if (!chart || typeof chart.dispose !== 'function') continue;
+    try {
+      chart.dispose();
+    } catch {
+      // ignore
+    }
+  }
+}
+
+let rebuildPromise = null;
+
+function scheduleChartsRebuild() {
+  if (rebuildPromise) return;
+
+  rebuildPromise = Promise.resolve()
+    .then(async () => {
+      if (!charts) return;
+      disposeCharts(charts);
+      charts = initCharts(getEchartsTheme());
+      resizeCharts(charts);
+      await refreshData();
+    })
+    .finally(() => {
+      rebuildPromise = null;
+    });
+}
 
 async function ensureWorldMapRegistered() {
   if (globalThis.echarts?.getMap?.('world')) return;
@@ -306,11 +341,12 @@ export async function refreshData() {
 
 
 export async function initDashboard() {
-  charts = initCharts();
+  charts = initCharts(getEchartsTheme());
   await Promise.all([fetchZones(), ensureWorldMapRegistered()]);
   await refreshData();
 
   window.addEventListener('resize', () => resizeCharts(charts));
+  window.addEventListener(THEME_EVENT_NAME, () => scheduleChartsRebuild());
 }
 
 // Expose for inline handlers in index.html

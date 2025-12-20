@@ -4,25 +4,35 @@
     <link rel="icon" href="https://q2.qlogo.cn/headimg_dl?dst_uin=2726730791&spec=0">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="color-scheme" content="light dark">
     <title>AcoFork 的 EdgeOne 监控大屏</title>
+    <script src="./assets/theme.js"></script>
     <!-- Tailwind CSS for Shadcn/UI style -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
     <link rel="stylesheet" href="./assets/styles.css">
     <script src="./assets/head.js"></script>
 </head>
-<body class="bg-slate-50 min-h-screen p-8">
+<body class="bg-background text-foreground min-h-screen p-8">
     <div class="max-w-7xl mx-auto space-y-8">
         
         <!-- Header -->
         <div class="flex items-center justify-between">
             <div>
-                <h1 id="page-header" class="text-3xl font-bold tracking-tight text-slate-900">AcoFork 的 EdgeOne 监控大屏</h1>
+                <h1 id="page-header" class="text-3xl font-bold tracking-tight text-foreground">AcoFork 的 EdgeOne 监控大屏</h1>
                 <p class="text-muted-foreground mt-1" data-i18n="header.subtitle">EdgeOne 站点流量与请求量分析</p>
             </div>
             <div class="flex items-center gap-2">
-                <label for="language" class="text-sm font-medium text-slate-600" data-i18n="controls.language">语言:</label>
-                <select id="language" class="h-9 w-[150px] rounded-md border border-slate-200 bg-white px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-slate-900">
+                <button id="themeToggle" type="button" aria-label="切换主题" data-i18n="controls.themeToggle" data-i18n-attr="aria-label" class="h-9 w-9 inline-flex items-center justify-center rounded-md border border-input bg-background text-foreground shadow-sm transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring">
+                    <svg class="h-4 w-4 dark:hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12.79A9 9 0 1111.21 3a7 7 0 009.79 9.79z"></path>
+                    </svg>
+                    <svg class="h-4 w-4 hidden dark:block" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v2m0 14v2m9-9h-2M5 12H3m15.364-6.364l-1.414 1.414M7.05 16.95l-1.414 1.414m0-11.314L7.05 7.05m9.9 9.9l1.414 1.414M12 8a4 4 0 100 8 4 4 0 000-8z"></path>
+                    </svg>
+                </button>
+                <label for="language" class="text-sm font-medium text-muted-foreground" data-i18n="controls.language">语言:</label>
+                <select id="language" class="h-9 w-[150px] rounded-md border border-input bg-background px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring">
                     <option value="zh-Hans" data-i18n="language.zhHans">简体中文</option>
                     <option value="en-US" data-i18n="language.enUS">English</option>
                 </select>
@@ -30,10 +40,10 @@
         </div>
 
         <!-- Time Controls -->
-        <div class="flex flex-wrap items-center gap-4 bg-white p-4 rounded-xl border shadow-sm">
+        <div class="flex flex-wrap items-center gap-4 bg-card p-4 rounded-xl border border-border shadow-sm">
             <div class="flex items-center space-x-2">
-                <label for="timeRange" class="text-sm font-medium" data-i18n="controls.timeRange">时间范围:</label>
-                <select id="timeRange" onchange="handleTimeRangeChange()" class="h-9 w-[180px] rounded-md border border-slate-200 bg-white px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-slate-900">
+                <label for="timeRange" class="text-sm font-medium text-muted-foreground" data-i18n="controls.timeRange">时间范围:</label>
+                <select id="timeRange" onchange="handleTimeRangeChange()" class="h-9 w-[180px] rounded-md border border-input bg-background px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring">
                     <option value="30min" data-i18n="timeRange.30min">近 30 分钟</option>
                     <option value="1h" data-i18n="timeRange.1h">近 1 小时</option>
                     <option value="6h" data-i18n="timeRange.6h">近 6 小时</option>
@@ -49,27 +59,27 @@
             <!-- Custom Time Inputs -->
             <div id="customTimeInputs" class="hidden flex-wrap items-center gap-2 mt-2 w-full sm:w-auto">
                 <div class="flex items-center space-x-1">
-                    <input type="number" id="customDays" placeholder="0" class="h-8 w-16 rounded-md border border-slate-200 px-2 text-sm" min="0" max="31">
+                    <input type="number" id="customDays" placeholder="0" class="h-8 w-16 rounded-md border border-input bg-background px-2 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring" min="0" max="31">
                     <span class="text-xs" data-i18n="units.day">天</span>
                 </div>
                 <div class="flex items-center space-x-1">
-                    <input type="number" id="customHours" placeholder="0" class="h-8 w-16 rounded-md border border-slate-200 px-2 text-sm" min="0" max="23">
+                    <input type="number" id="customHours" placeholder="0" class="h-8 w-16 rounded-md border border-input bg-background px-2 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring" min="0" max="23">
                     <span class="text-xs" data-i18n="units.hour">小时</span>
                 </div>
                 <div class="flex items-center space-x-1">
-                    <input type="number" id="customMinutes" placeholder="0" class="h-8 w-16 rounded-md border border-slate-200 px-2 text-sm" min="0" max="59">
+                    <input type="number" id="customMinutes" placeholder="0" class="h-8 w-16 rounded-md border border-input bg-background px-2 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring" min="0" max="59">
                     <span class="text-xs" data-i18n="units.minute">分</span>
                 </div>
                 <div class="flex items-center space-x-1">
-                    <input type="number" id="customSeconds" placeholder="0" class="h-8 w-16 rounded-md border border-slate-200 px-2 text-sm" min="0" max="59">
+                    <input type="number" id="customSeconds" placeholder="0" class="h-8 w-16 rounded-md border border-input bg-background px-2 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring" min="0" max="59">
                     <span class="text-xs" data-i18n="units.second">秒</span>
                 </div>
-                <button onclick="refreshData()" class="h-8 px-3 bg-slate-900 text-white rounded-md text-xs hover:bg-slate-800" data-i18n="controls.apply">应用</button>
+                <button onclick="refreshData()" class="h-8 px-3 bg-primary text-primary-foreground rounded-md text-xs transition-colors hover:bg-primary/90" data-i18n="controls.apply">应用</button>
                 <span id="timeRangeError" class="text-red-500 text-xs font-medium ml-2"></span>
             </div>
             <div class="flex items-center space-x-2">
-                <label for="interval" class="text-sm font-medium" data-i18n="controls.interval">粒度:</label>
-                <select id="interval" onchange="refreshData()" class="h-9 w-[180px] rounded-md border border-slate-200 bg-white px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-slate-900">
+                <label for="interval" class="text-sm font-medium text-muted-foreground" data-i18n="controls.interval">粒度:</label>
+                <select id="interval" onchange="refreshData()" class="h-9 w-[180px] rounded-md border border-input bg-background px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring">
                     <option value="auto" selected data-i18n="controls.intervalAuto">自动</option>
                     <option value="min" data-i18n="interval.min">1 分钟</option>
                     <option value="5min" data-i18n="interval.5min">5 分钟</option>
@@ -78,8 +88,8 @@
                 </select>
             </div>
             <div class="flex items-center space-x-2">
-                <label for="zoneId" class="text-sm font-medium" data-i18n="controls.zone">选择站点:</label>
-                <select id="zoneId" onchange="refreshData()" class="h-9 w-[240px] rounded-md border border-slate-200 bg-white px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-slate-900">
+                <label for="zoneId" class="text-sm font-medium text-muted-foreground" data-i18n="controls.zone">选择站点:</label>
+                <select id="zoneId" onchange="refreshData()" class="h-9 w-[240px] rounded-md border border-input bg-background px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring">
                      <option value="*" data-i18n="controls.zoneLoading">加载中...</option>
                 </select>
             </div>
@@ -93,7 +103,7 @@
 
             <!-- Section 1: Traffic (流量) -->
             <div class="space-y-4">
-                <h2 class="text-xl font-bold tracking-tight text-slate-800 flex items-center gap-2">
+                <h2 class="text-xl font-bold tracking-tight text-foreground flex items-center gap-2">
                     <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path></svg>
                     <span data-i18n="sections.traffic">流量分析 (Traffic)</span>
                 </h2>
@@ -142,7 +152,7 @@
 
             <!-- Section 2: Bandwidth (带宽) -->
             <div class="space-y-4">
-                <h2 class="text-xl font-bold tracking-tight text-slate-800 flex items-center gap-2">
+                <h2 class="text-xl font-bold tracking-tight text-foreground flex items-center gap-2">
                     <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
                     <span data-i18n="sections.bandwidth">带宽分析 (Bandwidth)</span>
                 </h2>
@@ -191,7 +201,7 @@
 
             <!-- Section 3: Origin Pull Analysis (回源分析) -->
             <div class="space-y-4">
-                <h2 class="text-xl font-bold tracking-tight text-slate-800 flex items-center gap-2">
+                <h2 class="text-xl font-bold tracking-tight text-foreground flex items-center gap-2">
                     <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"></path></svg>
                     <span data-i18n="sections.originPull">回源分析 (Origin Pull Analysis)</span>
                 </h2>
@@ -274,7 +284,7 @@
 
             <!-- Section: Edge Functions (边缘函数) -->
             <div class="space-y-4">
-                <h2 class="text-xl font-bold tracking-tight text-slate-800 flex items-center gap-2">
+                <h2 class="text-xl font-bold tracking-tight text-foreground flex items-center gap-2">
                     <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"></path></svg>
                     <span data-i18n="sections.edgeFunctions">边缘函数 (Edge Functions)</span>
                 </h2>
@@ -324,7 +334,7 @@
 
             <!-- Section: Pages Build Statistics (Pages 统计) -->
             <div class="space-y-4">
-                <h2 class="text-xl font-bold tracking-tight text-slate-800 flex items-center gap-2">
+                <h2 class="text-xl font-bold tracking-tight text-foreground flex items-center gap-2">
                     <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
                     <span data-i18n="sections.pages">Pages 统计 (Pages Stats)</span>
                 </h2>
@@ -395,7 +405,7 @@
 
             <!-- Section 4: Requests & Performance (请求与性能) -->
             <div class="space-y-4">
-                <h2 class="text-xl font-bold tracking-tight text-slate-800 flex items-center gap-2">
+                <h2 class="text-xl font-bold tracking-tight text-foreground flex items-center gap-2">
                     <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                     <span data-i18n="sections.requestsPerformance">请求与性能 (Requests & Performance)</span>
                 </h2>
@@ -455,7 +465,7 @@
 
             <!-- Section 5: Security Analysis (安全分析) -->
             <div class="space-y-4">
-                <h2 class="text-xl font-bold tracking-tight text-slate-800 flex items-center gap-2">
+                <h2 class="text-xl font-bold tracking-tight text-foreground flex items-center gap-2">
                     <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
                     <span data-i18n="sections.security">安全分析 (Security Analysis)</span>
                 </h2>
@@ -484,7 +494,7 @@
 
             <!-- Section 6: Top Analysis (TOP 分析) -->
             <div class="space-y-4">
-                <h2 class="text-xl font-bold tracking-tight text-slate-800 flex items-center gap-2">
+                <h2 class="text-xl font-bold tracking-tight text-foreground flex items-center gap-2">
                     <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
                     <span data-i18n="sections.topAnalysis">TOP 分析 (Top Analysis)</span>
                 </h2>

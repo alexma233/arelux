@@ -60,6 +60,7 @@ const MESSAGES = {
       low: '低',
     },
     controls: {
+      themeToggle: '切换主题',
       language: '语言:',
       timeRange: '时间范围:',
       apply: '应用',
@@ -215,6 +216,7 @@ const MESSAGES = {
       low: 'Low',
     },
     controls: {
+      themeToggle: 'Toggle theme',
       language: 'Language:',
       timeRange: 'Time Range:',
       apply: 'Apply',
