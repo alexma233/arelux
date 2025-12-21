@@ -1,3 +1,7 @@
+> [!TIP]
+> 本仓库在 Forgejo 上提供镜像
+> <https://forgejo.alexma.top/alexma233/eo_monitior>
+
 # EdgeOne Monitoring Dashboard (EdgeOne 监控大屏)
 
 > [!NOTE]
