@@ -1,10 +1,10 @@
 > [!TIP]
 > 本仓库在 Forgejo 上提供镜像
-> <https://forgejo.alexma.top/alexma233/eo_monitior>
+> <https://forgejo.alexma.top/alexma233/arelux>
 
 [简体中文](README.zh-Hans.md) | [English](README.md)
 
-# EdgeOne Monitoring Dashboard (EdgeOne 监控大屏)
+# arelux
 
 > [!NOTE]
 > 提示：本项目已全面支持腾讯云 EdgeOne 全球版（中国站与国际站账号均可直接使用）。
@@ -37,7 +37,7 @@
 4. 在 **环境变量 (Environment Variables)** 中添加以下配置：
    - `SECRET_ID`: 您的腾讯云 SecretId
    - `SECRET_KEY`: 您的腾讯云 SecretKey
-   - `SITE_NAME`: (可选) 自定义大屏标题，默认为 "AcoFork 的 EdgeOne 监控大屏"
+   - `SITE_NAME`: (可选) 自定义大屏标题，默认为 "arelux"
    - `SITE_ICON`: (可选) 自定义网页图标，默认为 "https://q2.qlogo.cn/headimg_dl?dst_uin=2726730791&spec=0"
 5. 部署项目。
 
@@ -45,8 +45,8 @@
 
 1. 克隆仓库：
    ```bash
-   git clone https://github.com/afoim/eo_monitior
-   cd eo_monitior
+   git clone https://github.com/alexma233/arelux
+   cd arelux
    ```
 
 2. 安装依赖：

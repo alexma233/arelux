@@ -1,6 +1,6 @@
 # AGENTS.md
 
-> 这是一份给协作型 AI（下称“Agent”）的行为与输出规范，用于 **EdgeOne Monitoring Dashboard（EdgeOne 监控大屏）** 项目。在不与具体任务冲突的前提下，请严格遵循本文件。
+> 这是一份给协作型 AI（下称“Agent”）的行为与输出规范，用于 **arelux** 项目。在不与具体任务冲突的前提下，请严格遵循本文件。
 
 ---
 

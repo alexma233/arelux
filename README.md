@@ -1,10 +1,10 @@
 > [!TIP]
 > This repository is mirrored on Forgejo:
-> <https://forgejo.alexma.top/alexma233/eo_monitior>
+> <https://forgejo.alexma.top/alexma233/arelux>
 
 [English](README.md) | [简体中文](README.zh-Hans.md)
 
-# EdgeOne Monitoring Dashboard
+# arelux
 
 > [!NOTE]
 > Note: This project fully supports Tencent Cloud EdgeOne Global Edition (both China and International accounts can be used directly).
@@ -36,7 +36,7 @@ This is a real-time monitoring dashboard built on the Tencent Cloud EdgeOne API,
 4. Add the following in **Environment Variables**:
    - `SECRET_ID`: your Tencent Cloud SecretId
    - `SECRET_KEY`: your Tencent Cloud SecretKey
-   - `SITE_NAME`: (optional) dashboard title; default is "AcoFork 的 EdgeOne 监控大屏"
+   - `SITE_NAME`: (optional) dashboard title; default is "arelux"
    - `SITE_ICON`: (optional) favicon URL; default is "https://q2.qlogo.cn/headimg_dl?dst_uin=2726730791&spec=0"
 5. Deploy the project.
 
@@ -44,8 +44,8 @@ This is a real-time monitoring dashboard built on the Tencent Cloud EdgeOne API,
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/afoim/eo_monitior
-   cd eo_monitior
+   git clone https://github.com/alexma233/arelux
+   cd arelux
    ```
 
 2. Install dependencies:
