@@ -1,7 +1,9 @@
-import { metricColors, metricLabels, metricsConfig } from '../constants.js';
+import { getMetricLabel, metricColors, metricsConfig } from '../constants.js';
+import { getLocale } from '../i18n.js';
 import { formatCount, getBestCountUnit } from '../utils.js';
 
 export function updateEdgeFunctionsSection(charts, results) {
+    const locale = getLocale();
     const chartFunctionRequests = charts.functionRequests;
     const chartFunctionCpu = charts.functionCpu;
     const metrics = metricsConfig.edgeFunctions;
@@ -31,14 +33,14 @@ export function updateEdgeFunctionsSection(charts, results) {
 
         // Update KPI
         const kpiEl = document.getElementById(config.kpiId);
-        if (kpiEl) {
-            if (config.unitType === 'count') {
-                kpiEl.innerText = formatCount(data.sum);
-            } else if (config.unitType === 'ms') {
-                // Format large numbers with commas
-                kpiEl.innerText = data.sum.toLocaleString() + ' ms';
+            if (kpiEl) {
+                if (config.unitType === 'count') {
+                    kpiEl.innerText = formatCount(data.sum);
+                } else if (config.unitType === 'ms') {
+                    // Format large numbers with commas
+                    kpiEl.innerText = data.sum.toLocaleString(locale) + ' ms';
+                }
             }
-        }
 
         // Chart
         const chart = config.chart;
@@ -67,18 +69,18 @@ export function updateEdgeFunctionsSection(charts, results) {
                     const val = data.valueData[param.dataIndex];
                     let formattedVal = val;
                     if (config.unitType === 'count') formattedVal = formatCount(val);
-                    else formattedVal = val.toLocaleString() + ' ms';
+                    else formattedVal = val.toLocaleString(locale) + ' ms';
 
                     res += `${param.marker}${param.seriesName}: ${formattedVal}<br/>`;
                 });
                 return res;
             }},
-            legend: { data: [metricLabels[metric]], bottom: 0 },
+            legend: { data: [getMetricLabel(metric, locale)], bottom: 0 },
             grid: { left: '3%', right: '4%', bottom: '10%', top: '15%', containLabel: true },
             xAxis: { type: 'category', boundaryGap: false, data: data.timeData },
             yAxis: { type: 'value', name: unit },
             series: [{
-                name: metricLabels[metric],
+                name: getMetricLabel(metric, locale),
                 type: 'line',
                 smooth: true,
                 data: seriesData,

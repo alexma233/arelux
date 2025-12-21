@@ -1,7 +1,9 @@
-import { metricColors, metricLabels, metricsConfig } from '../constants.js';
+import { getMetricLabel, metricColors, metricsConfig } from '../constants.js';
+import { getLocale } from '../i18n.js';
 import { formatBytes, getBestUnit } from '../utils.js';
 
 export function updateTrafficSection(charts, results) {
+    const locale = getLocale();
     const chartTraffic = charts.traffic;
     const metrics = metricsConfig.traffic;
     const series = [];
@@ -32,7 +34,7 @@ export function updateTrafficSection(charts, results) {
         const valueData = data.valueData.map(v => (v / divisor).toFixed(2));
 
         series.push({
-            name: metricLabels[metric],
+            name: getMetricLabel(metric, locale),
             type: 'line',
             smooth: true,
             data: valueData,
@@ -57,7 +59,7 @@ export function updateTrafficSection(charts, results) {
             });
             return res;
         }},
-        legend: { data: metrics.map(m => metricLabels[m]), bottom: 0 },
+        legend: { data: metrics.map(m => getMetricLabel(m, locale)), bottom: 0 },
         grid: { left: '3%', right: '4%', bottom: '10%', top: '15%', containLabel: true },
         xAxis: { type: 'category', boundaryGap: false, data: timeData },
         yAxis: { type: 'value', name: unit },

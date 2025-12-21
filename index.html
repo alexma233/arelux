@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-Hans">
 <head>
     <link rel="icon" href="https://q2.qlogo.cn/headimg_dl?dst_uin=2726730791&spec=0">
     <meta charset="UTF-8">
@@ -19,62 +19,69 @@
         <div class="flex items-center justify-between">
             <div>
                 <h1 id="page-header" class="text-3xl font-bold tracking-tight text-slate-900">AcoFork 的 EdgeOne 监控大屏</h1>
-                <p class="text-muted-foreground mt-1">EdgeOne 站点流量与请求量分析</p>
+                <p class="text-muted-foreground mt-1" data-i18n="header.subtitle">EdgeOne 站点流量与请求量分析</p>
+            </div>
+            <div class="flex items-center gap-2">
+                <label for="language" class="text-sm font-medium text-slate-600" data-i18n="controls.language">语言:</label>
+                <select id="language" class="h-9 w-[150px] rounded-md border border-slate-200 bg-white px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-slate-900">
+                    <option value="zh-Hans" data-i18n="language.zhHans">简体中文</option>
+                    <option value="en-US" data-i18n="language.enUS">English</option>
+                </select>
             </div>
         </div>
 
         <!-- Time Controls -->
         <div class="flex flex-wrap items-center gap-4 bg-white p-4 rounded-xl border shadow-sm">
             <div class="flex items-center space-x-2">
-                <label for="timeRange" class="text-sm font-medium">时间范围:</label>
+                <label for="timeRange" class="text-sm font-medium" data-i18n="controls.timeRange">时间范围:</label>
                 <select id="timeRange" onchange="handleTimeRangeChange()" class="h-9 w-[180px] rounded-md border border-slate-200 bg-white px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-slate-900">
-                    <option value="30min">近 30 分钟</option>
-                    <option value="1h">近 1 小时</option>
-                    <option value="6h">近 6 小时</option>
-                    <option value="today">今日</option>
-                    <option value="yesterday">昨日</option>
-                    <option value="3d">近 3 天</option>
-                    <option value="7d">近 7 天</option>
-                    <option value="14d">近 14 天</option>
-                    <option value="31d">近 31 天</option>
-                    <option value="custom">自定义</option>
+                    <option value="30min" data-i18n="timeRange.30min">近 30 分钟</option>
+                    <option value="1h" data-i18n="timeRange.1h">近 1 小时</option>
+                    <option value="6h" data-i18n="timeRange.6h">近 6 小时</option>
+                    <option value="today" data-i18n="timeRange.today">今日</option>
+                    <option value="yesterday" data-i18n="timeRange.yesterday">昨日</option>
+                    <option value="3d" data-i18n="timeRange.3d">近 3 天</option>
+                    <option value="7d" data-i18n="timeRange.7d">近 7 天</option>
+                    <option value="14d" data-i18n="timeRange.14d">近 14 天</option>
+                    <option value="31d" data-i18n="timeRange.31d">近 31 天</option>
+                    <option value="custom" data-i18n="timeRange.custom">自定义</option>
                 </select>
             </div>
             <!-- Custom Time Inputs -->
             <div id="customTimeInputs" class="hidden flex-wrap items-center gap-2 mt-2 w-full sm:w-auto">
                 <div class="flex items-center space-x-1">
                     <input type="number" id="customDays" placeholder="0" class="h-8 w-16 rounded-md border border-slate-200 px-2 text-sm" min="0" max="31">
-                    <span class="text-xs">天</span>
+                    <span class="text-xs" data-i18n="units.day">天</span>
                 </div>
                 <div class="flex items-center space-x-1">
                     <input type="number" id="customHours" placeholder="0" class="h-8 w-16 rounded-md border border-slate-200 px-2 text-sm" min="0" max="23">
-                    <span class="text-xs">小时</span>
+                    <span class="text-xs" data-i18n="units.hour">小时</span>
                 </div>
                 <div class="flex items-center space-x-1">
                     <input type="number" id="customMinutes" placeholder="0" class="h-8 w-16 rounded-md border border-slate-200 px-2 text-sm" min="0" max="59">
-                    <span class="text-xs">分</span>
+                    <span class="text-xs" data-i18n="units.minute">分</span>
                 </div>
                 <div class="flex items-center space-x-1">
                     <input type="number" id="customSeconds" placeholder="0" class="h-8 w-16 rounded-md border border-slate-200 px-2 text-sm" min="0" max="59">
-                    <span class="text-xs">秒</span>
+                    <span class="text-xs" data-i18n="units.second">秒</span>
                 </div>
-                <button onclick="refreshData()" class="h-8 px-3 bg-slate-900 text-white rounded-md text-xs hover:bg-slate-800">应用</button>
+                <button onclick="refreshData()" class="h-8 px-3 bg-slate-900 text-white rounded-md text-xs hover:bg-slate-800" data-i18n="controls.apply">应用</button>
                 <span id="timeRangeError" class="text-red-500 text-xs font-medium ml-2"></span>
             </div>
             <div class="flex items-center space-x-2">
-                <label for="interval" class="text-sm font-medium">粒度:</label>
+                <label for="interval" class="text-sm font-medium" data-i18n="controls.interval">粒度:</label>
                 <select id="interval" onchange="refreshData()" class="h-9 w-[180px] rounded-md border border-slate-200 bg-white px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-slate-900">
-                    <option value="auto" selected>自动</option>
-                    <option value="min">1 分钟</option>
-                    <option value="5min">5 分钟</option>
-                    <option value="hour">1 小时</option>
-                    <option value="day">1 天</option>
+                    <option value="auto" selected data-i18n="controls.intervalAuto">自动</option>
+                    <option value="min" data-i18n="interval.min">1 分钟</option>
+                    <option value="5min" data-i18n="interval.5min">5 分钟</option>
+                    <option value="hour" data-i18n="interval.hour">1 小时</option>
+                    <option value="day" data-i18n="interval.day">1 天</option>
                 </select>
             </div>
             <div class="flex items-center space-x-2">
-                <label for="zoneId" class="text-sm font-medium">选择站点:</label>
+                <label for="zoneId" class="text-sm font-medium" data-i18n="controls.zone">选择站点:</label>
                 <select id="zoneId" onchange="refreshData()" class="h-9 w-[240px] rounded-md border border-slate-200 bg-white px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-slate-900">
-                     <option value="*">加载中...</option>
+                     <option value="*" data-i18n="controls.zoneLoading">加载中...</option>
                 </select>
             </div>
             <!-- <button onclick="refreshData()" class="h-9 px-4 py-2 bg-slate-900 text-white hover:bg-slate-900/90 inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-slate-950 shadow">
@@ -89,44 +96,44 @@
             <div class="space-y-4">
                 <h2 class="text-xl font-bold tracking-tight text-slate-800 flex items-center gap-2">
                     <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path></svg>
-                    流量分析 (Traffic)
+                    <span data-i18n="sections.traffic">流量分析 (Traffic)</span>
                 </h2>
                 <div class="grid gap-4 md:grid-cols-3 lg:grid-cols-3">
                     <!-- Total Traffic Card -->
                     <div class="rounded-xl border bg-card text-card-foreground shadow-sm">
                         <div class="p-6 flex flex-row items-center justify-between space-y-0 pb-2">
-                            <h3 class="tracking-tight text-sm font-medium text-muted-foreground">总流量 (Total)</h3>
+                            <h3 class="tracking-tight text-sm font-medium text-muted-foreground" data-i18n="traffic.total.title">总流量 (Total)</h3>
                         </div>
                         <div class="p-6 pt-0">
                             <div class="text-2xl font-bold" id="kpi_l7Flow_flux">加载中...</div>
-                            <p class="text-xs text-muted-foreground mt-1">访问总流量</p>
+                            <p class="text-xs text-muted-foreground mt-1" data-i18n="traffic.total.desc">访问总流量</p>
                         </div>
                     </div>
                     <!-- Client Request Traffic -->
                     <div class="rounded-xl border bg-card text-card-foreground shadow-sm">
                         <div class="p-6 flex flex-row items-center justify-between space-y-0 pb-2">
-                            <h3 class="tracking-tight text-sm font-medium text-muted-foreground">客户端请求流量 (In)</h3>
+                            <h3 class="tracking-tight text-sm font-medium text-muted-foreground" data-i18n="traffic.in.title">客户端请求流量 (In)</h3>
                         </div>
                         <div class="p-6 pt-0">
                             <div class="text-2xl font-bold" id="kpi_l7Flow_inFlux">加载中...</div>
-                            <p class="text-xs text-muted-foreground mt-1">客户端请求流量</p>
+                            <p class="text-xs text-muted-foreground mt-1" data-i18n="traffic.in.desc">客户端请求流量</p>
                         </div>
                     </div>
                     <!-- EdgeOne Response Traffic -->
                     <div class="rounded-xl border bg-card text-card-foreground shadow-sm">
                         <div class="p-6 flex flex-row items-center justify-between space-y-0 pb-2">
-                            <h3 class="tracking-tight text-sm font-medium text-muted-foreground">响应流量 (Out)</h3>
+                            <h3 class="tracking-tight text-sm font-medium text-muted-foreground" data-i18n="traffic.out.title">响应流量 (Out)</h3>
                         </div>
                         <div class="p-6 pt-0">
                             <div class="text-2xl font-bold" id="kpi_l7Flow_outFlux">加载中...</div>
-                            <p class="text-xs text-muted-foreground mt-1">EdgeOne 响应流量</p>
+                            <p class="text-xs text-muted-foreground mt-1" data-i18n="traffic.out.desc">EdgeOne 响应流量</p>
                         </div>
                     </div>
                 </div>
                 <!-- Traffic Chart -->
                 <div class="rounded-xl border bg-card text-card-foreground shadow-sm">
                     <div class="flex flex-col space-y-1.5 p-6">
-                        <h3 class="font-semibold leading-none tracking-tight">流量趋势</h3>
+                        <h3 class="font-semibold leading-none tracking-tight" data-i18n="traffic.trend">流量趋势</h3>
                     </div>
                     <div class="p-6 pt-0">
                         <div id="chart_traffic" class="w-full h-[350px]"></div>
@@ -138,44 +145,44 @@
             <div class="space-y-4">
                 <h2 class="text-xl font-bold tracking-tight text-slate-800 flex items-center gap-2">
                     <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
-                    带宽分析 (Bandwidth)
+                    <span data-i18n="sections.bandwidth">带宽分析 (Bandwidth)</span>
                 </h2>
                 <div class="grid gap-4 md:grid-cols-3 lg:grid-cols-3">
                     <!-- Total Bandwidth -->
                     <div class="rounded-xl border bg-card text-card-foreground shadow-sm">
                         <div class="p-6 flex flex-row items-center justify-between space-y-0 pb-2">
-                            <h3 class="tracking-tight text-sm font-medium text-muted-foreground">总带宽峰值 (Total)</h3>
+                            <h3 class="tracking-tight text-sm font-medium text-muted-foreground" data-i18n="bandwidth.total.title">总带宽峰值 (Total)</h3>
                         </div>
                         <div class="p-6 pt-0">
                             <div class="text-2xl font-bold" id="kpi_l7Flow_bandwidth">加载中...</div>
-                            <p class="text-xs text-muted-foreground mt-1">访问总带宽峰值</p>
+                            <p class="text-xs text-muted-foreground mt-1" data-i18n="bandwidth.total.desc">访问总带宽峰值</p>
                         </div>
                     </div>
                     <!-- In Bandwidth -->
                     <div class="rounded-xl border bg-card text-card-foreground shadow-sm">
                         <div class="p-6 flex flex-row items-center justify-between space-y-0 pb-2">
-                            <h3 class="tracking-tight text-sm font-medium text-muted-foreground">请求带宽峰值 (In)</h3>
+                            <h3 class="tracking-tight text-sm font-medium text-muted-foreground" data-i18n="bandwidth.in.title">请求带宽峰值 (In)</h3>
                         </div>
                         <div class="p-6 pt-0">
                             <div class="text-2xl font-bold" id="kpi_l7Flow_inBandwidth">加载中...</div>
-                            <p class="text-xs text-muted-foreground mt-1">客户端请求带宽峰值</p>
+                            <p class="text-xs text-muted-foreground mt-1" data-i18n="bandwidth.in.desc">客户端请求带宽峰值</p>
                         </div>
                     </div>
                     <!-- Out Bandwidth -->
                     <div class="rounded-xl border bg-card text-card-foreground shadow-sm">
                         <div class="p-6 flex flex-row items-center justify-between space-y-0 pb-2">
-                            <h3 class="tracking-tight text-sm font-medium text-muted-foreground">响应带宽峰值 (Out)</h3>
+                            <h3 class="tracking-tight text-sm font-medium text-muted-foreground" data-i18n="bandwidth.out.title">响应带宽峰值 (Out)</h3>
                         </div>
                         <div class="p-6 pt-0">
                             <div class="text-2xl font-bold" id="kpi_l7Flow_outBandwidth">加载中...</div>
-                            <p class="text-xs text-muted-foreground mt-1">EdgeOne 响应带宽峰值</p>
+                            <p class="text-xs text-muted-foreground mt-1" data-i18n="bandwidth.out.desc">EdgeOne 响应带宽峰值</p>
                         </div>
                     </div>
                 </div>
                 <!-- Bandwidth Chart -->
                 <div class="rounded-xl border bg-card text-card-foreground shadow-sm">
                     <div class="flex flex-col space-y-1.5 p-6">
-                        <h3 class="font-semibold leading-none tracking-tight">带宽趋势</h3>
+                        <h3 class="font-semibold leading-none tracking-tight" data-i18n="bandwidth.trend">带宽趋势</h3>
                     </div>
                     <div class="p-6 pt-0">
                         <div id="chart_bandwidth" class="w-full h-[350px]"></div>
@@ -187,37 +194,37 @@
             <div class="space-y-4">
                 <h2 class="text-xl font-bold tracking-tight text-slate-800 flex items-center gap-2">
                     <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"></path></svg>
-                    回源分析 (Origin Pull Analysis)
+                    <span data-i18n="sections.originPull">回源分析 (Origin Pull Analysis)</span>
                 </h2>
                 <div class="grid gap-4 md:grid-cols-3 lg:grid-cols-3">
                     <!-- Origin Out Flux -->
                     <div class="rounded-xl border bg-card text-card-foreground shadow-sm">
                         <div class="p-6 flex flex-row items-center justify-between space-y-0 pb-2">
-                            <h3 class="tracking-tight text-sm font-medium text-muted-foreground">回源请求流量</h3>
+                            <h3 class="tracking-tight text-sm font-medium text-muted-foreground" data-i18n="originPull.outFlux.title">回源请求流量</h3>
                         </div>
                         <div class="p-6 pt-0">
                             <div class="text-2xl font-bold" id="kpi_l7Flow_outFlux_hy">加载中...</div>
-                            <p class="text-xs text-muted-foreground mt-1">EdgeOne 节点至源站</p>
+                            <p class="text-xs text-muted-foreground mt-1" data-i18n="originPull.edgeToOrigin">EdgeOne 节点至源站</p>
                         </div>
                     </div>
                     <!-- Origin Requests -->
                     <div class="rounded-xl border bg-card text-card-foreground shadow-sm">
                         <div class="p-6 flex flex-row items-center justify-between space-y-0 pb-2">
-                            <h3 class="tracking-tight text-sm font-medium text-muted-foreground">回源请求数</h3>
+                            <h3 class="tracking-tight text-sm font-medium text-muted-foreground" data-i18n="originPull.requests.title">回源请求数</h3>
                         </div>
                         <div class="p-6 pt-0">
                             <div class="text-2xl font-bold" id="kpi_l7Flow_request_hy">加载中...</div>
-                            <p class="text-xs text-muted-foreground mt-1">EdgeOne 节点至源站</p>
+                            <p class="text-xs text-muted-foreground mt-1" data-i18n="originPull.edgeToOrigin">EdgeOne 节点至源站</p>
                         </div>
                     </div>
                     <!-- Origin Out Bandwidth -->
                     <div class="rounded-xl border bg-card text-card-foreground shadow-sm">
                         <div class="p-6 flex flex-row items-center justify-between space-y-0 pb-2">
-                            <h3 class="tracking-tight text-sm font-medium text-muted-foreground">回源请求带宽峰值</h3>
+                            <h3 class="tracking-tight text-sm font-medium text-muted-foreground" data-i18n="originPull.outBandwidth.title">回源请求带宽峰值</h3>
                         </div>
                         <div class="p-6 pt-0">
                             <div class="text-2xl font-bold" id="kpi_l7Flow_outBandwidth_hy">加载中...</div>
-                            <p class="text-xs text-muted-foreground mt-1">EdgeOne 节点至源站</p>
+                            <p class="text-xs text-muted-foreground mt-1" data-i18n="originPull.edgeToOrigin">EdgeOne 节点至源站</p>
                         </div>
                     </div>
                 </div>
@@ -226,31 +233,31 @@
                     <!-- Origin In Flux -->
                     <div class="rounded-xl border bg-card text-card-foreground shadow-sm">
                         <div class="p-6 flex flex-row items-center justify-between space-y-0 pb-2">
-                            <h3 class="tracking-tight text-sm font-medium text-muted-foreground">回源响应流量</h3>
+                            <h3 class="tracking-tight text-sm font-medium text-muted-foreground" data-i18n="originPull.inFlux.title">回源响应流量</h3>
                         </div>
                         <div class="p-6 pt-0">
                             <div class="text-2xl font-bold" id="kpi_l7Flow_inFlux_hy">加载中...</div>
-                            <p class="text-xs text-muted-foreground mt-1">源站至 EdgeOne 节点</p>
+                            <p class="text-xs text-muted-foreground mt-1" data-i18n="originPull.originToEdge">源站至 EdgeOne 节点</p>
                         </div>
                     </div>
                     <!-- Origin In Bandwidth -->
                     <div class="rounded-xl border bg-card text-card-foreground shadow-sm">
                         <div class="p-6 flex flex-row items-center justify-between space-y-0 pb-2">
-                            <h3 class="tracking-tight text-sm font-medium text-muted-foreground">回源响应带宽峰值</h3>
+                            <h3 class="tracking-tight text-sm font-medium text-muted-foreground" data-i18n="originPull.inBandwidth.title">回源响应带宽峰值</h3>
                         </div>
                         <div class="p-6 pt-0">
                             <div class="text-2xl font-bold" id="kpi_l7Flow_inBandwidth_hy">加载中...</div>
-                            <p class="text-xs text-muted-foreground mt-1">源站至 EdgeOne 节点</p>
+                            <p class="text-xs text-muted-foreground mt-1" data-i18n="originPull.originToEdge">源站至 EdgeOne 节点</p>
                         </div>
                     </div>
                     <!-- Cache Hit Rate -->
                     <div class="rounded-xl border bg-card text-card-foreground shadow-sm">
                         <div class="p-6 flex flex-row items-center justify-between space-y-0 pb-2">
-                            <h3 class="tracking-tight text-sm font-medium text-muted-foreground">缓存命中率</h3>
+                            <h3 class="tracking-tight text-sm font-medium text-muted-foreground" data-i18n="originPull.cacheHitRate.title">缓存命中率</h3>
                         </div>
                         <div class="p-6 pt-0">
                             <div class="text-2xl font-bold" id="kpi_cache_hit_rate">加载中...</div>
-                            <p class="text-xs text-muted-foreground mt-1">1 - (源站响应 / EdgeOne 响应)</p>
+                            <p class="text-xs text-muted-foreground mt-1" data-i18n="originPull.cacheHitRate.desc">1 - (源站响应 / EdgeOne 响应)</p>
                         </div>
                     </div>
                 </div>
@@ -258,7 +265,7 @@
                 <!-- Origin Pull Chart -->
                 <div class="rounded-xl border bg-card text-card-foreground shadow-sm">
                     <div class="flex flex-col space-y-1.5 p-6">
-                        <h3 class="font-semibold leading-none tracking-tight">回源趋势</h3>
+                        <h3 class="font-semibold leading-none tracking-tight" data-i18n="originPull.trend">回源趋势</h3>
                     </div>
                     <div class="p-6 pt-0">
                         <div id="chart_origin_pull" class="w-full h-[350px]"></div>
@@ -270,27 +277,27 @@
             <div class="space-y-4">
                 <h2 class="text-xl font-bold tracking-tight text-slate-800 flex items-center gap-2">
                     <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"></path></svg>
-                    边缘函数 (Edge Functions)
+                    <span data-i18n="sections.edgeFunctions">边缘函数 (Edge Functions)</span>
                 </h2>
                 <div class="grid gap-4 md:grid-cols-2 lg:grid-cols-2">
                     <!-- Function Requests -->
                     <div class="rounded-xl border bg-card text-card-foreground shadow-sm">
                         <div class="p-6 flex flex-row items-center justify-between space-y-0 pb-2">
-                            <h3 class="tracking-tight text-sm font-medium text-muted-foreground">总请求数</h3>
+                            <h3 class="tracking-tight text-sm font-medium text-muted-foreground" data-i18n="edgeFunctions.requests.title">总请求数</h3>
                         </div>
                         <div class="p-6 pt-0">
                             <div class="text-2xl font-bold" id="kpi_function_requestCount">加载中...</div>
-                            <p class="text-xs text-muted-foreground mt-1">Edge Functions 总调用次数</p>
+                            <p class="text-xs text-muted-foreground mt-1" data-i18n="edgeFunctions.requests.desc">Edge Functions 总调用次数</p>
                         </div>
                     </div>
                     <!-- Function CPU Time -->
                     <div class="rounded-xl border bg-card text-card-foreground shadow-sm">
                         <div class="p-6 flex flex-row items-center justify-between space-y-0 pb-2">
-                            <h3 class="tracking-tight text-sm font-medium text-muted-foreground">总 CPU 时间</h3>
+                            <h3 class="tracking-tight text-sm font-medium text-muted-foreground" data-i18n="edgeFunctions.cpu.title">总 CPU 时间</h3>
                         </div>
                         <div class="p-6 pt-0">
                             <div class="text-2xl font-bold" id="kpi_function_cpuCostTime">加载中...</div>
-                            <p class="text-xs text-muted-foreground mt-1">Edge Functions 总 CPU 耗时 (ms)</p>
+                            <p class="text-xs text-muted-foreground mt-1" data-i18n="edgeFunctions.cpu.desc">Edge Functions 总 CPU 耗时 (ms)</p>
                         </div>
                     </div>
                 </div>
@@ -298,7 +305,7 @@
                     <!-- Function Requests Chart -->
                     <div class="rounded-xl border bg-card text-card-foreground shadow-sm">
                         <div class="flex flex-col space-y-1.5 p-6">
-                            <h3 class="font-semibold leading-none tracking-tight">函数请求数趋势</h3>
+                            <h3 class="font-semibold leading-none tracking-tight" data-i18n="edgeFunctions.requests.trend">函数请求数趋势</h3>
                         </div>
                         <div class="p-6 pt-0">
                             <div id="chart_function_requests" class="w-full h-[350px]"></div>
@@ -307,7 +314,7 @@
                     <!-- Function CPU Chart -->
                     <div class="rounded-xl border bg-card text-card-foreground shadow-sm">
                         <div class="flex flex-col space-y-1.5 p-6">
-                            <h3 class="font-semibold leading-none tracking-tight">函数 CPU 耗时趋势</h3>
+                            <h3 class="font-semibold leading-none tracking-tight" data-i18n="edgeFunctions.cpu.trend">函数 CPU 耗时趋势</h3>
                         </div>
                         <div class="p-6 pt-0">
                             <div id="chart_function_cpu" class="w-full h-[350px]"></div>
@@ -320,57 +327,57 @@
             <div class="space-y-4">
                 <h2 class="text-xl font-bold tracking-tight text-slate-800 flex items-center gap-2">
                     <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
-                    Pages 统计 (Pages Stats)
+                    <span data-i18n="sections.pages">Pages 统计 (Pages Stats)</span>
                 </h2>
                 <div class="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
                     <!-- Daily Build Count -->
                     <div class="rounded-xl border bg-card text-card-foreground shadow-sm">
                         <div class="p-6 flex flex-row items-center justify-between space-y-0 pb-2">
-                            <h3 class="tracking-tight text-sm font-medium text-muted-foreground">当日构建次数</h3>
+                            <h3 class="tracking-tight text-sm font-medium text-muted-foreground" data-i18n="pages.dailyBuild.title">当日构建次数</h3>
                         </div>
                         <div class="p-6 pt-0">
                             <div class="text-2xl font-bold" id="kpi_pages_daily_build">加载中...</div>
-                            <p class="text-xs text-muted-foreground mt-1">Pages 当日构建总次数</p>
+                            <p class="text-xs text-muted-foreground mt-1" data-i18n="pages.dailyBuild.desc">Pages 当日构建总次数</p>
                         </div>
                     </div>
                     <!-- Monthly Build Count -->
                     <div class="rounded-xl border bg-card text-card-foreground shadow-sm">
                         <div class="p-6 flex flex-row items-center justify-between space-y-0 pb-2">
-                            <h3 class="tracking-tight text-sm font-medium text-muted-foreground">当月构建次数</h3>
+                            <h3 class="tracking-tight text-sm font-medium text-muted-foreground" data-i18n="pages.monthlyBuild.title">当月构建次数</h3>
                         </div>
                         <div class="p-6 pt-0">
                             <div class="text-2xl font-bold" id="kpi_pages_monthly_build">加载中...</div>
-                            <p class="text-xs text-muted-foreground mt-1">Pages 当月构建总次数</p>
+                            <p class="text-xs text-muted-foreground mt-1" data-i18n="pages.monthlyBuild.desc">Pages 当月构建总次数</p>
                         </div>
                     </div>
                     <!-- Cloud Functions 24h Requests -->
                     <div class="rounded-xl border bg-card text-card-foreground shadow-sm">
                         <div class="p-6 flex flex-row items-center justify-between space-y-0 pb-2">
-                            <h3 class="tracking-tight text-sm font-medium text-muted-foreground">Cloud Functions 24h 请求数</h3>
+                            <h3 class="tracking-tight text-sm font-medium text-muted-foreground" data-i18n="pages.cf24h.title">Cloud Functions 24h 请求数</h3>
                         </div>
                         <div class="p-6 pt-0">
                             <div class="text-2xl font-bold" id="kpi_pages_cloud_function_total">加载中...</div>
-                            <p class="text-xs text-muted-foreground mt-1">Cloud Functions 24h 总请求数</p>
+                            <p class="text-xs text-muted-foreground mt-1" data-i18n="pages.cf24h.desc">Cloud Functions 24h 总请求数</p>
                         </div>
                     </div>
                     <!-- Cloud Functions Monthly Requests -->
                     <div class="rounded-xl border bg-card text-card-foreground shadow-sm">
                         <div class="p-6 flex flex-row items-center justify-between space-y-0 pb-2">
-                            <h3 class="tracking-tight text-sm font-medium text-muted-foreground">当月 Cloud Functions 请求数</h3>
+                            <h3 class="tracking-tight text-sm font-medium text-muted-foreground" data-i18n="pages.cfMonthlyRequests.title">当月 Cloud Functions 请求数</h3>
                         </div>
                         <div class="p-6 pt-0">
                             <div class="text-2xl font-bold" id="kpi_pages_monthly_cf_requests">加载中...</div>
-                            <p class="text-xs text-muted-foreground mt-1">本月累计请求数</p>
+                            <p class="text-xs text-muted-foreground mt-1" data-i18n="pages.cfMonthlyRequests.desc">本月累计请求数</p>
                         </div>
                     </div>
                      <!-- Cloud Functions Monthly GBs -->
                      <div class="rounded-xl border bg-card text-card-foreground shadow-sm">
                         <div class="p-6 flex flex-row items-center justify-between space-y-0 pb-2">
-                            <h3 class="tracking-tight text-sm font-medium text-muted-foreground">当月 Cloud Functions GBs</h3>
+                            <h3 class="tracking-tight text-sm font-medium text-muted-foreground" data-i18n="pages.cfMonthlyGbs.title">当月 Cloud Functions GBs</h3>
                         </div>
                         <div class="p-6 pt-0">
                             <div class="text-2xl font-bold" id="kpi_pages_monthly_cf_gbs">加载中...</div>
-                            <p class="text-xs text-muted-foreground mt-1">本月累计资源使用量 (GBs)</p>
+                            <p class="text-xs text-muted-foreground mt-1" data-i18n="pages.cfMonthlyGbs.desc">本月累计资源使用量 (GBs)</p>
                         </div>
                     </div>
                 </div>
@@ -378,7 +385,7 @@
                 <div class="grid gap-4 md:grid-cols-1 lg:grid-cols-1">
                      <div class="rounded-xl border bg-card text-card-foreground shadow-sm">
                         <div class="flex flex-col space-y-1.5 p-6">
-                            <h3 class="font-semibold leading-none tracking-tight">Cloud Functions 请求数趋势</h3>
+                            <h3 class="font-semibold leading-none tracking-tight" data-i18n="pages.cfTrend">Cloud Functions 请求数趋势</h3>
                         </div>
                         <div class="p-6 pt-0">
                             <div id="chart_pages_cloud_function_requests" class="w-full h-[350px]"></div>
@@ -391,37 +398,37 @@
             <div class="space-y-4">
                 <h2 class="text-xl font-bold tracking-tight text-slate-800 flex items-center gap-2">
                     <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                    请求与性能 (Requests & Performance)
+                    <span data-i18n="sections.requestsPerformance">请求与性能 (Requests & Performance)</span>
                 </h2>
                 <div class="grid gap-4 md:grid-cols-3 lg:grid-cols-3">
                     <!-- Total Requests -->
                     <div class="rounded-xl border bg-card text-card-foreground shadow-sm">
                         <div class="p-6 flex flex-row items-center justify-between space-y-0 pb-2">
-                            <h3 class="tracking-tight text-sm font-medium text-muted-foreground">总请求数</h3>
+                            <h3 class="tracking-tight text-sm font-medium text-muted-foreground" data-i18n="reqPerf.totalRequests.title">总请求数</h3>
                         </div>
                         <div class="p-6 pt-0">
                             <div class="text-2xl font-bold" id="kpi_l7Flow_request">加载中...</div>
-                            <p class="text-xs text-muted-foreground mt-1">总请求次数</p>
+                            <p class="text-xs text-muted-foreground mt-1" data-i18n="reqPerf.totalRequests.desc">总请求次数</p>
                         </div>
                     </div>
                     <!-- Avg Response Time -->
                     <div class="rounded-xl border bg-card text-card-foreground shadow-sm">
                         <div class="p-6 flex flex-row items-center justify-between space-y-0 pb-2">
-                            <h3 class="tracking-tight text-sm font-medium text-muted-foreground">平均响应耗时</h3>
+                            <h3 class="tracking-tight text-sm font-medium text-muted-foreground" data-i18n="reqPerf.avgResp.title">平均响应耗时</h3>
                         </div>
                         <div class="p-6 pt-0">
                             <div class="text-2xl font-bold" id="kpi_l7Flow_avgResponseTime">加载中...</div>
-                            <p class="text-xs text-muted-foreground mt-1">L7 访问平均响应耗时 (ms)</p>
+                            <p class="text-xs text-muted-foreground mt-1" data-i18n="reqPerf.avgResp.desc">L7 访问平均响应耗时 (ms)</p>
                         </div>
                     </div>
                     <!-- Avg First Byte Time -->
                     <div class="rounded-xl border bg-card text-card-foreground shadow-sm">
                         <div class="p-6 flex flex-row items-center justify-between space-y-0 pb-2">
-                            <h3 class="tracking-tight text-sm font-medium text-muted-foreground">平均首字节耗时</h3>
+                            <h3 class="tracking-tight text-sm font-medium text-muted-foreground" data-i18n="reqPerf.ttfb.title">平均首字节耗时</h3>
                         </div>
                         <div class="p-6 pt-0">
                             <div class="text-2xl font-bold" id="kpi_l7Flow_avgFirstByteResponseTime">加载中...</div>
-                            <p class="text-xs text-muted-foreground mt-1">L7 访问平均首字节响应耗时 (ms)</p>
+                            <p class="text-xs text-muted-foreground mt-1" data-i18n="reqPerf.ttfb.desc">L7 访问平均首字节响应耗时 (ms)</p>
                         </div>
                     </div>
                 </div>
@@ -429,7 +436,7 @@
                     <!-- Requests Chart -->
                     <div class="rounded-xl border bg-card text-card-foreground shadow-sm">
                         <div class="flex flex-col space-y-1.5 p-6">
-                            <h3 class="font-semibold leading-none tracking-tight">请求数趋势</h3>
+                            <h3 class="font-semibold leading-none tracking-tight" data-i18n="reqPerf.requestsTrend">请求数趋势</h3>
                         </div>
                         <div class="p-6 pt-0">
                             <div id="chart_requests" class="w-full h-[350px]"></div>
@@ -438,7 +445,7 @@
                     <!-- Performance Chart -->
                     <div class="rounded-xl border bg-card text-card-foreground shadow-sm">
                         <div class="flex flex-col space-y-1.5 p-6">
-                            <h3 class="font-semibold leading-none tracking-tight">响应耗时趋势</h3>
+                            <h3 class="font-semibold leading-none tracking-tight" data-i18n="reqPerf.latencyTrend">响应耗时趋势</h3>
                         </div>
                         <div class="p-6 pt-0">
                             <div id="chart_performance" class="w-full h-[350px]"></div>
@@ -451,24 +458,24 @@
             <div class="space-y-4">
                 <h2 class="text-xl font-bold tracking-tight text-slate-800 flex items-center gap-2">
                     <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
-                    安全分析 (Security Analysis)
+                    <span data-i18n="sections.security">安全分析 (Security Analysis)</span>
                 </h2>
                 <div class="grid gap-4 md:grid-cols-3 lg:grid-cols-3">
                     <!-- Total Protection Hits -->
                     <div class="rounded-xl border bg-card text-card-foreground shadow-sm">
                         <div class="p-6 flex flex-row items-center justify-between space-y-0 pb-2">
-                            <h3 class="tracking-tight text-sm font-medium text-muted-foreground">总防护命中次数</h3>
+                            <h3 class="tracking-tight text-sm font-medium text-muted-foreground" data-i18n="security.hits.title">总防护命中次数</h3>
                         </div>
                         <div class="p-6 pt-0">
                             <div class="text-2xl font-bold" id="kpi_security_hits">加载中...</div>
-                            <p class="text-xs text-muted-foreground mt-1">DDoS/CC 防护总拦截次数</p>
+                            <p class="text-xs text-muted-foreground mt-1" data-i18n="charts.securityHitsDescription">DDoS/CC 防护总拦截次数</p>
                         </div>
                     </div>
                 </div>
                 <!-- Security Chart -->
                 <div class="rounded-xl border bg-card text-card-foreground shadow-sm">
                     <div class="flex flex-col space-y-1.5 p-6">
-                        <h3 class="font-semibold leading-none tracking-tight">安全防护趋势</h3>
+                        <h3 class="font-semibold leading-none tracking-tight" data-i18n="security.trend">安全防护趋势</h3>
                     </div>
                     <div class="p-6 pt-0">
                         <div id="chart_security" class="w-full h-[350px]"></div>
@@ -480,12 +487,12 @@
             <div class="space-y-4">
                 <h2 class="text-xl font-bold tracking-tight text-slate-800 flex items-center gap-2">
                     <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
-                    TOP 分析 (Top Analysis)
+                    <span data-i18n="sections.topAnalysis">TOP 分析 (Top Analysis)</span>
                 </h2>
                 <!-- World Map -->
                 <div class="rounded-xl border bg-card text-card-foreground shadow-sm">
                     <div class="flex flex-col space-y-1.5 p-6">
-                        <h3 class="font-semibold leading-none tracking-tight">全球请求分布</h3>
+                        <h3 class="font-semibold leading-none tracking-tight" data-i18n="top.worldMap">全球请求分布</h3>
                     </div>
                     <div class="p-6 pt-0">
                         <div id="chart_top_map" class="w-full h-[500px]"></div>
@@ -495,7 +502,7 @@
                     <!-- Country -->
                     <div class="rounded-xl border bg-card text-card-foreground shadow-sm">
                         <div class="flex flex-col space-y-1.5 p-6">
-                            <h3 class="font-semibold leading-none tracking-tight">国家/地区流量排行</h3>
+                            <h3 class="font-semibold leading-none tracking-tight" data-i18n="top.countryFlux">国家/地区流量排行</h3>
                         </div>
                         <div class="p-6 pt-0">
                             <div id="chart_top_country" class="w-full h-[500px]"></div>
@@ -503,7 +510,7 @@
                     </div>
                     <div class="rounded-xl border bg-card text-card-foreground shadow-sm">
                         <div class="flex flex-col space-y-1.5 p-6">
-                            <h3 class="font-semibold leading-none tracking-tight">国家/地区请求数排行</h3>
+                            <h3 class="font-semibold leading-none tracking-tight" data-i18n="top.countryReq">国家/地区请求数排行</h3>
                         </div>
                         <div class="p-6 pt-0">
                             <div id="chart_top_request_country" class="w-full h-[500px]"></div>
@@ -513,7 +520,7 @@
                     <!-- Province -->
                     <div class="rounded-xl border bg-card text-card-foreground shadow-sm">
                         <div class="flex flex-col space-y-1.5 p-6">
-                            <h3 class="font-semibold leading-none tracking-tight">国内省份流量排行</h3>
+                            <h3 class="font-semibold leading-none tracking-tight" data-i18n="top.provinceFlux">国内省份流量排行</h3>
                         </div>
                         <div class="p-6 pt-0">
                             <div id="chart_top_province" class="w-full h-[500px]"></div>
@@ -521,7 +528,7 @@
                     </div>
                     <div class="rounded-xl border bg-card text-card-foreground shadow-sm">
                         <div class="flex flex-col space-y-1.5 p-6">
-                            <h3 class="font-semibold leading-none tracking-tight">国内省份请求数排行</h3>
+                            <h3 class="font-semibold leading-none tracking-tight" data-i18n="top.provinceReq">国内省份请求数排行</h3>
                         </div>
                         <div class="p-6 pt-0">
                             <div id="chart_top_request_province" class="w-full h-[500px]"></div>
@@ -531,7 +538,7 @@
                     <!-- Status Code -->
                     <div class="rounded-xl border bg-card text-card-foreground shadow-sm">
                         <div class="flex flex-col space-y-1.5 p-6">
-                            <h3 class="font-semibold leading-none tracking-tight">状态码流量排行</h3>
+                            <h3 class="font-semibold leading-none tracking-tight" data-i18n="top.statusFlux">状态码流量排行</h3>
                         </div>
                         <div class="p-6 pt-0">
                             <div id="chart_top_status_code" class="w-full h-[500px]"></div>
@@ -539,7 +546,7 @@
                     </div>
                     <div class="rounded-xl border bg-card text-card-foreground shadow-sm">
                         <div class="flex flex-col space-y-1.5 p-6">
-                            <h3 class="font-semibold leading-none tracking-tight">状态码请求数排行</h3>
+                            <h3 class="font-semibold leading-none tracking-tight" data-i18n="top.statusReq">状态码请求数排行</h3>
                         </div>
                         <div class="p-6 pt-0">
                             <div id="chart_top_request_status_code" class="w-full h-[500px]"></div>
@@ -549,7 +556,7 @@
                     <!-- Domain -->
                     <div class="rounded-xl border bg-card text-card-foreground shadow-sm">
                         <div class="flex flex-col space-y-1.5 p-6">
-                            <h3 class="font-semibold leading-none tracking-tight">域名流量排行</h3>
+                            <h3 class="font-semibold leading-none tracking-tight" data-i18n="top.domainFlux">域名流量排行</h3>
                         </div>
                         <div class="p-6 pt-0">
                             <div id="chart_top_domain" class="w-full h-[500px]"></div>
@@ -557,7 +564,7 @@
                     </div>
                     <div class="rounded-xl border bg-card text-card-foreground shadow-sm">
                         <div class="flex flex-col space-y-1.5 p-6">
-                            <h3 class="font-semibold leading-none tracking-tight">域名请求数排行</h3>
+                            <h3 class="font-semibold leading-none tracking-tight" data-i18n="top.domainReq">域名请求数排行</h3>
                         </div>
                         <div class="p-6 pt-0">
                             <div id="chart_top_request_domain" class="w-full h-[500px]"></div>
@@ -567,7 +574,7 @@
                     <!-- URL -->
                     <div class="rounded-xl border bg-card text-card-foreground shadow-sm">
                         <div class="flex flex-col space-y-1.5 p-6">
-                            <h3 class="font-semibold leading-none tracking-tight">URL 流量排行</h3>
+                            <h3 class="font-semibold leading-none tracking-tight" data-i18n="top.urlFlux">URL 流量排行</h3>
                         </div>
                         <div class="p-6 pt-0">
                             <div id="chart_top_url" class="w-full h-[500px]"></div>
@@ -575,7 +582,7 @@
                     </div>
                     <div class="rounded-xl border bg-card text-card-foreground shadow-sm">
                         <div class="flex flex-col space-y-1.5 p-6">
-                            <h3 class="font-semibold leading-none tracking-tight">URL 请求数排行</h3>
+                            <h3 class="font-semibold leading-none tracking-tight" data-i18n="top.urlReq">URL 请求数排行</h3>
                         </div>
                         <div class="p-6 pt-0">
                             <div id="chart_top_request_url" class="w-full h-[500px]"></div>
@@ -585,7 +592,7 @@
                     <!-- Resource Type -->
                     <div class="rounded-xl border bg-card text-card-foreground shadow-sm">
                         <div class="flex flex-col space-y-1.5 p-6">
-                            <h3 class="font-semibold leading-none tracking-tight">资源类型流量排行</h3>
+                            <h3 class="font-semibold leading-none tracking-tight" data-i18n="top.resourceFlux">资源类型流量排行</h3>
                         </div>
                         <div class="p-6 pt-0">
                             <div id="chart_top_resource_type" class="w-full h-[500px]"></div>
@@ -593,7 +600,7 @@
                     </div>
                     <div class="rounded-xl border bg-card text-card-foreground shadow-sm">
                         <div class="flex flex-col space-y-1.5 p-6">
-                            <h3 class="font-semibold leading-none tracking-tight">资源类型请求数排行</h3>
+                            <h3 class="font-semibold leading-none tracking-tight" data-i18n="top.resourceReq">资源类型请求数排行</h3>
                         </div>
                         <div class="p-6 pt-0">
                             <div id="chart_top_request_resource_type" class="w-full h-[500px]"></div>
@@ -603,7 +610,7 @@
                     <!-- Client IP -->
                     <div class="rounded-xl border bg-card text-card-foreground shadow-sm">
                         <div class="flex flex-col space-y-1.5 p-6">
-                            <h3 class="font-semibold leading-none tracking-tight">客户端IP流量排行</h3>
+                            <h3 class="font-semibold leading-none tracking-tight" data-i18n="top.sipFlux">客户端IP流量排行</h3>
                         </div>
                         <div class="p-6 pt-0">
                             <div id="chart_top_sip" class="w-full h-[500px]"></div>
@@ -611,7 +618,7 @@
                     </div>
                     <div class="rounded-xl border bg-card text-card-foreground shadow-sm">
                         <div class="flex flex-col space-y-1.5 p-6">
-                            <h3 class="font-semibold leading-none tracking-tight">客户端IP请求数排行</h3>
+                            <h3 class="font-semibold leading-none tracking-tight" data-i18n="top.sipReq">客户端IP请求数排行</h3>
                         </div>
                         <div class="p-6 pt-0">
                             <div id="chart_top_request_sip" class="w-full h-[500px]"></div>
@@ -621,7 +628,7 @@
                     <!-- Referer -->
                     <div class="rounded-xl border bg-card text-card-foreground shadow-sm">
                         <div class="flex flex-col space-y-1.5 p-6">
-                            <h3 class="font-semibold leading-none tracking-tight">Referer 流量排行</h3>
+                            <h3 class="font-semibold leading-none tracking-tight" data-i18n="top.refererFlux">Referer 流量排行</h3>
                         </div>
                         <div class="p-6 pt-0">
                             <div id="chart_top_referer" class="w-full h-[500px]"></div>
@@ -629,7 +636,7 @@
                     </div>
                     <div class="rounded-xl border bg-card text-card-foreground shadow-sm">
                         <div class="flex flex-col space-y-1.5 p-6">
-                            <h3 class="font-semibold leading-none tracking-tight">Referer 请求数排行</h3>
+                            <h3 class="font-semibold leading-none tracking-tight" data-i18n="top.refererReq">Referer 请求数排行</h3>
                         </div>
                         <div class="p-6 pt-0">
                             <div id="chart_top_request_referer" class="w-full h-[500px]"></div>
@@ -639,7 +646,7 @@
                     <!-- Device Type -->
                     <div class="rounded-xl border bg-card text-card-foreground shadow-sm">
                         <div class="flex flex-col space-y-1.5 p-6">
-                            <h3 class="font-semibold leading-none tracking-tight">设备类型流量排行</h3>
+                            <h3 class="font-semibold leading-none tracking-tight" data-i18n="top.deviceFlux">设备类型流量排行</h3>
                         </div>
                         <div class="p-6 pt-0">
                             <div id="chart_top_ua_device" class="w-full h-[500px]"></div>
@@ -647,7 +654,7 @@
                     </div>
                     <div class="rounded-xl border bg-card text-card-foreground shadow-sm">
                         <div class="flex flex-col space-y-1.5 p-6">
-                            <h3 class="font-semibold leading-none tracking-tight">设备类型请求数排行</h3>
+                            <h3 class="font-semibold leading-none tracking-tight" data-i18n="top.deviceReq">设备类型请求数排行</h3>
                         </div>
                         <div class="p-6 pt-0">
                             <div id="chart_top_request_ua_device" class="w-full h-[500px]"></div>
@@ -657,7 +664,7 @@
                     <!-- Browser -->
                     <div class="rounded-xl border bg-card text-card-foreground shadow-sm">
                         <div class="flex flex-col space-y-1.5 p-6">
-                            <h3 class="font-semibold leading-none tracking-tight">浏览器流量排行</h3>
+                            <h3 class="font-semibold leading-none tracking-tight" data-i18n="top.browserFlux">浏览器流量排行</h3>
                         </div>
                         <div class="p-6 pt-0">
                             <div id="chart_top_ua_browser" class="w-full h-[500px]"></div>
@@ -665,7 +672,7 @@
                     </div>
                     <div class="rounded-xl border bg-card text-card-foreground shadow-sm">
                         <div class="flex flex-col space-y-1.5 p-6">
-                            <h3 class="font-semibold leading-none tracking-tight">浏览器请求数排行</h3>
+                            <h3 class="font-semibold leading-none tracking-tight" data-i18n="top.browserReq">浏览器请求数排行</h3>
                         </div>
                         <div class="p-6 pt-0">
                             <div id="chart_top_request_ua_browser" class="w-full h-[500px]"></div>
@@ -675,7 +682,7 @@
                     <!-- OS -->
                     <div class="rounded-xl border bg-card text-card-foreground shadow-sm">
                         <div class="flex flex-col space-y-1.5 p-6">
-                            <h3 class="font-semibold leading-none tracking-tight">操作系统流量排行</h3>
+                            <h3 class="font-semibold leading-none tracking-tight" data-i18n="top.osFlux">操作系统流量排行</h3>
                         </div>
                         <div class="p-6 pt-0">
                             <div id="chart_top_ua_os" class="w-full h-[500px]"></div>
@@ -683,7 +690,7 @@
                     </div>
                     <div class="rounded-xl border bg-card text-card-foreground shadow-sm">
                         <div class="flex flex-col space-y-1.5 p-6">
-                            <h3 class="font-semibold leading-none tracking-tight">操作系统请求数排行</h3>
+                            <h3 class="font-semibold leading-none tracking-tight" data-i18n="top.osReq">操作系统请求数排行</h3>
                         </div>
                         <div class="p-6 pt-0">
                             <div id="chart_top_request_ua_os" class="w-full h-[500px]"></div>
@@ -693,7 +700,7 @@
                     <!-- User Agent -->
                     <div class="rounded-xl border bg-card text-card-foreground shadow-sm">
                         <div class="flex flex-col space-y-1.5 p-6">
-                            <h3 class="font-semibold leading-none tracking-tight">User Agent 流量排行</h3>
+                            <h3 class="font-semibold leading-none tracking-tight" data-i18n="top.uaFlux">User Agent 流量排行</h3>
                         </div>
                         <div class="p-6 pt-0">
                             <div id="chart_top_ua" class="w-full h-[500px]"></div>
@@ -701,7 +708,7 @@
                     </div>
                     <div class="rounded-xl border bg-card text-card-foreground shadow-sm">
                         <div class="flex flex-col space-y-1.5 p-6">
-                            <h3 class="font-semibold leading-none tracking-tight">User Agent 请求数排行</h3>
+                            <h3 class="font-semibold leading-none tracking-tight" data-i18n="top.uaReq">User Agent 请求数排行</h3>
                         </div>
                         <div class="p-6 pt-0">
                             <div id="chart_top_request_ua" class="w-full h-[500px]"></div>
@@ -715,11 +722,11 @@
         <!-- Footer -->
         <div class="flex flex-col justify-center items-center pt-8 pb-4 text-sm text-muted-foreground space-y-2">
             <div>
-                Powered By <a href="https://2x.nz" target="_blank" class="ml-1 font-medium underline underline-offset-4 hover:text-primary">AcoFork</a>
+                <span data-i18n="footer.poweredBy">Powered By</span> <a href="https://2x.nz" target="_blank" class="ml-1 font-medium underline underline-offset-4 hover:text-primary">AcoFork</a>
             </div>
             <a href="https://github.com/afoim/eo_monitior" target="_blank" class="flex items-center hover:text-primary transition-colors">
                 <svg class="h-4 w-4 mr-2" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path fill-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" clip-rule="evenodd"></path></svg>
-                GitHub Project
+                <span data-i18n="footer.githubProject">GitHub Project</span>
             </a>
         </div>
 

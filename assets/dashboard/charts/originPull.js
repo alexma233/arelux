@@ -1,4 +1,5 @@
-import { metricColors, metricLabels, metricsConfig } from '../constants.js';
+import { getMetricLabel, metricColors, metricsConfig } from '../constants.js';
+import { getLocale } from '../i18n.js';
 import {
   formatBps,
   formatBytes,
@@ -9,6 +10,7 @@ import {
 
 //3.有使用
 export function updateOriginPullSection(charts, results) {
+    const locale = getLocale();
     const chartOriginPull = charts.originPull;
     const metrics = metricsConfig.originPull;
     const series = [];
@@ -51,7 +53,7 @@ export function updateOriginPullSection(charts, results) {
             } else if (metric.includes('request')) {
                  kpiEl.innerText = formatCount(data.sum);
             } else {
-                 kpiEl.innerText = data.sum.toLocaleString();
+                 kpiEl.innerText = data.sum.toLocaleString(locale);
             }
         }
 
@@ -62,15 +64,19 @@ export function updateOriginPullSection(charts, results) {
         let divisor = 1;
 
         // Normalize data for chart
+        let valueType = 'number';
         if (metric.includes('Flux')) {
             unit = fluxUnit.unit;
             divisor = fluxUnit.divisor;
+            valueType = 'bytes';
         } else if (metric.includes('Bandwidth')) {
             unit = bandwidthUnit.unit;
             divisor = bandwidthUnit.divisor;
+            valueType = 'bps';
         } else if (metric.includes('request')) {
             unit = requestUnit.unit;
             divisor = requestUnit.divisor;
+            valueType = 'count';
         } else {
             unit = '';
             divisor = 1;
@@ -82,13 +88,14 @@ export function updateOriginPullSection(charts, results) {
         });
 
         series.push({
-            name: metricLabels[metric],
+            name: getMetricLabel(metric, locale),
             type: 'line',
             smooth: true,
             data: chartData,
             itemStyle: { color: metricColors[metric] },
             areaStyle: { opacity: 0.1 },
             customUnit: unit,
+            valueType,
             rawData: data.valueData
         });
     });
@@ -104,17 +111,16 @@ export function updateOriginPullSection(charts, results) {
                     const dataIndex = param.dataIndex;
                     const rawVal = series[seriesIndex].rawData[dataIndex];
 
-                    const unit = series[seriesIndex].customUnit || '';
                     let formattedVal = '';
 
-                    if (unit.includes('bps')) {
+                    if (series[seriesIndex].valueType === 'bps') {
                         formattedVal = formatBps(rawVal);
-                    } else if (unit.includes('B')) {
+                    } else if (series[seriesIndex].valueType === 'bytes') {
                         formattedVal = formatBytes(rawVal);
-                    } else if (unit.includes('千') || unit.includes('万') || unit.includes('亿')) {
+                    } else if (series[seriesIndex].valueType === 'count') {
                         formattedVal = formatCount(rawVal);
                     } else {
-                        formattedVal = rawVal.toLocaleString();
+                        formattedVal = rawVal.toLocaleString(locale);
                     }
 
                     res += `${param.marker}${param.seriesName}: ${formattedVal}<br/>`;
@@ -122,7 +128,7 @@ export function updateOriginPullSection(charts, results) {
                 return res;
             }
         },
-        legend: { data: metrics.map(m => metricLabels[m]), bottom: 0 },
+        legend: { data: metrics.map(m => getMetricLabel(m, locale)), bottom: 0 },
         grid: { left: '3%', right: '4%', bottom: '10%', top: '15%', containLabel: true },
         xAxis: { type: 'category', boundaryGap: false, data: timeData },
         yAxis: { type: 'value' },

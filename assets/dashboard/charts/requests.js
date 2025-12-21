@@ -1,8 +1,10 @@
-import { metricColors, metricLabels, metricsConfig } from '../constants.js';
+import { getMetricLabel, metricColors, metricsConfig } from '../constants.js';
+import { getLocale } from '../i18n.js';
 import { formatCount, getBestCountUnit } from '../utils.js';
 
 //4.有使用
 export function updateRequestsSection(charts, results) {
+    const locale = getLocale();
     const chartRequests = charts.requests;
     const metrics = metricsConfig.requests;
     const series = [];
@@ -36,7 +38,7 @@ export function updateRequestsSection(charts, results) {
         });
 
         series.push({
-            name: metricLabels[metric],
+            name: getMetricLabel(metric, locale),
             type: 'line',
             smooth: true,
             data: valueData,

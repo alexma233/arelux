@@ -1,8 +1,10 @@
-import { metricColors, metricLabels, metricsConfig } from '../constants.js';
+import { getMetricLabel, metricColors, metricsConfig } from '../constants.js';
+import { getLocale } from '../i18n.js';
 import { formatBps, getBestUnit } from '../utils.js';
 
 //2.有使用
 export function updateBandwidthSection(charts, results) {
+    const locale = getLocale();
     const chartBandwidth = charts.bandwidth;
     const metrics = metricsConfig.bandwidth;
     const series = [];
@@ -33,7 +35,7 @@ export function updateBandwidthSection(charts, results) {
         const valueData = data.valueData.map(v => (v / divisor).toFixed(2));
 
         series.push({
-            name: metricLabels[metric],
+            name: getMetricLabel(metric, locale),
             type: 'line',
             smooth: true,
             data: valueData,
@@ -56,7 +58,7 @@ export function updateBandwidthSection(charts, results) {
             });
             return res;
         }},
-        legend: { data: metrics.map(m => metricLabels[m]), bottom: 0 },
+        legend: { data: metrics.map(m => getMetricLabel(m, locale)), bottom: 0 },
         grid: { left: '3%', right: '4%', bottom: '10%', top: '15%', containLabel: true },
         xAxis: { type: 'category', boundaryGap: false, data: timeData },
         yAxis: { type: 'value', name: unit },
