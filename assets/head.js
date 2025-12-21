@@ -1,68 +1,22 @@
-        // Fetch config immediately
-        async function fetchConfig() {
-            try {
-                const response = await fetch('/api/config');
-                const config = await response.json();
-                if (config.siteName) {
-                    document.title = config.siteName;
-                    const headerEl = document.getElementById('page-header');
-                    if (headerEl) headerEl.innerText = config.siteName;
-                }
-                if(config.siteIcon) {
-                    const favicon = document.querySelector('link[rel="icon"]');
-                    if(favicon) favicon.href = config.siteIcon;
-                }
-            } catch (err) {
-                console.error("Error fetching config:", err);
-            }
-        }
-        fetchConfig();
+// 获取站点配置（标题/图标）：
+// - 用 defer 加载，避免阻塞首屏渲染
+// - 只更新必要 DOM，避免重复布局/回流
+(async function fetchConfig() {
+  try {
+    const response = await fetch('/api/config');
+    const config = await response.json();
 
-        tailwind.config = {
-            darkMode: 'class',
-            theme: {
-                extend: {
-                    colors: {
-                        border: "hsl(var(--border))",
-                        input: "hsl(var(--input))",
-                        ring: "hsl(var(--ring))",
-                        background: "hsl(var(--background))",
-                        foreground: "hsl(var(--foreground))",
-                        primary: {
-                            DEFAULT: "hsl(var(--primary))",
-                            foreground: "hsl(var(--primary-foreground))",
-                        },
-                        secondary: {
-                            DEFAULT: "hsl(var(--secondary))",
-                            foreground: "hsl(var(--secondary-foreground))",
-                        },
-                        destructive: {
-                            DEFAULT: "hsl(var(--destructive))",
-                            foreground: "hsl(var(--destructive-foreground))",
-                        },
-                        muted: {
-                            DEFAULT: "hsl(var(--muted))",
-                            foreground: "hsl(var(--muted-foreground))",
-                        },
-                        accent: {
-                            DEFAULT: "hsl(var(--accent))",
-                            foreground: "hsl(var(--accent-foreground))",
-                        },
-                        popover: {
-                            DEFAULT: "hsl(var(--popover))",
-                            foreground: "hsl(var(--popover-foreground))",
-                        },
-                        card: {
-                            DEFAULT: "hsl(var(--card))",
-                            foreground: "hsl(var(--card-foreground))",
-                        },
-                    },
-                    borderRadius: {
-                        lg: "var(--radius)",
-                        md: "calc(var(--radius) - 2px)",
-                        sm: "calc(var(--radius) - 4px)",
-                    },
-                },
-            },
-        }
-    
+    if (config?.siteName) {
+      document.title = config.siteName;
+      const headerEl = document.getElementById('page-header');
+      if (headerEl) headerEl.innerText = config.siteName;
+    }
+
+    if (config?.siteIcon) {
+      const favicon = document.querySelector('link[rel="icon"]');
+      if (favicon) favicon.href = config.siteIcon;
+    }
+  } catch (err) {
+    console.error('Error fetching config:', err);
+  }
+})();

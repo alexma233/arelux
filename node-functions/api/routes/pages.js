@@ -2,9 +2,35 @@ import { getKeys } from "../lib/credentials.js";
 import { requestTeoWithRegionFallback } from "../lib/teoPagesRegionFallback.js";
 import { resolveZoneId } from "../lib/zones.js";
 
+const PAGES_CACHE = new Map();
+
+function getCacheEntry(key) {
+  const entry = PAGES_CACHE.get(key);
+  if (!entry) return null;
+  if (Date.now() >= entry.expiresAt) {
+    PAGES_CACHE.delete(key);
+    return null;
+  }
+  return entry.data;
+}
+
+function setCacheEntry(key, data, ttlMs) {
+  // 注意：简单兜底避免无界增长（Pages 指标通常只有少量组合）
+  if (PAGES_CACHE.size > 200) PAGES_CACHE.clear();
+  PAGES_CACHE.set(key, { data, expiresAt: Date.now() + ttlMs });
+}
+
 export function registerPagesRoutes(app) {
   app.get("/pages/build-count", async (req, res) => {
     try {
+      res.set("Cache-Control", "private, max-age=60");
+      const noCache = String(req.query.noCache || "") === "1";
+      const cacheKey = `build-count:${req.query.zoneId || "*"}`;
+      if (!noCache) {
+        const cached = getCacheEntry(cacheKey);
+        if (cached) return res.json(cached);
+      }
+
       const { secretId, secretKey } = getKeys();
 
       if (!secretId || !secretKey) {
@@ -37,6 +63,7 @@ export function registerPagesRoutes(app) {
         }
       }
 
+      if (!noCache) setCacheEntry(cacheKey, data, 60 * 1000);
       res.json(data);
     } catch (err) {
       console.error("Error calling DescribePagesResources:", err);
@@ -46,6 +73,14 @@ export function registerPagesRoutes(app) {
 
   app.get("/pages/cloud-function-requests", async (req, res) => {
     try {
+      res.set("Cache-Control", "private, max-age=60");
+      const noCache = String(req.query.noCache || "") === "1";
+      const cacheKey = `cf-requests:${req.query.zoneId || "*"}:${req.query.startTime || ""}:${req.query.endTime || ""}`;
+      if (!noCache) {
+        const cached = getCacheEntry(cacheKey);
+        if (cached) return res.json(cached);
+      }
+
       const { secretId, secretKey } = getKeys();
 
       if (!secretId || !secretKey) {
@@ -87,6 +122,7 @@ export function registerPagesRoutes(app) {
         }
       }
 
+      if (!noCache) setCacheEntry(cacheKey, data, 60 * 1000);
       res.json(data);
     } catch (err) {
       console.error("Error calling DescribePagesResources for CloudFunction:", err);
@@ -96,6 +132,14 @@ export function registerPagesRoutes(app) {
 
   app.get("/pages/cloud-function-monthly-stats", async (req, res) => {
     try {
+      res.set("Cache-Control", "private, max-age=300");
+      const noCache = String(req.query.noCache || "") === "1";
+      const cacheKey = `cf-monthly:${req.query.zoneId || "*"}`;
+      if (!noCache) {
+        const cached = getCacheEntry(cacheKey);
+        if (cached) return res.json(cached);
+      }
+
       const { secretId, secretKey } = getKeys();
 
       if (!secretId || !secretKey) {
@@ -132,6 +176,7 @@ export function registerPagesRoutes(app) {
         }
       }
 
+      if (!noCache) setCacheEntry(cacheKey, data, 300 * 1000);
       res.json(data);
     } catch (err) {
       console.error("Error calling DescribePagesResources for CloudFunction Monthly:", err);
@@ -139,4 +184,3 @@ export function registerPagesRoutes(app) {
     }
   });
 }
-

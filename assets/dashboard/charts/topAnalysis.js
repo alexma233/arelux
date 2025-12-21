@@ -6,6 +6,7 @@ import {
   worldNameMap,
 } from '../constants.js';
 import { getLocale, t } from '../i18n.js';
+import { ensureWorldMapRegistered } from '../geo.js';
 import {
   formatBytes,
   formatCount,
@@ -115,8 +116,17 @@ function updateTopMapChart(charts, results) {
     const data = results[metric];
 
     if (!data || data.type !== 'top' || !data.data) return;
+    if (!chartTopMap) return;
+
+    // 懒加载世界地图：只有 Top Map 需要时才加载 4MB+ 的 GeoJSON
     if (!globalThis.echarts?.getMap?.('world')) {
-        chartTopMap?.clear?.();
+        ensureWorldMapRegistered().then((ok) => {
+            if (!ok) {
+                chartTopMap.clear();
+                return;
+            }
+            updateTopMapChart(charts, results);
+        });
         return;
     }
 

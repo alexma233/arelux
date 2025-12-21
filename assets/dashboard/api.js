@@ -1,6 +1,20 @@
 
 import { calculateTimeRange } from './utils.js';
 
+function normalizeMetricsInput(metrics) {
+  if (!metrics) return [];
+  if (typeof metrics === 'string') {
+    return metrics
+      .split(',')
+      .map((s) => s.trim())
+      .filter(Boolean);
+  }
+  if (Array.isArray(metrics)) {
+    return metrics.map((s) => String(s).trim()).filter(Boolean);
+  }
+  return [];
+}
+
 async function fetchData(metric, rangeOverride) {
     try {
         const { startTime, endTime } = rangeOverride || calculateTimeRange();
@@ -23,6 +37,38 @@ async function fetchData(metric, rangeOverride) {
         console.error(`Error fetching ${metric}:`, err);
         return null;
     }
+}
+
+async function fetchBatchData(metrics, rangeOverride) {
+  try {
+    const metricList = normalizeMetricsInput(metrics);
+    if (metricList.length === 0) return null;
+
+    const { startTime, endTime } = rangeOverride || calculateTimeRange();
+    const interval = document.getElementById('interval').value;
+    const zoneId = document.getElementById('zoneId').value.trim();
+
+    let url = metricList.length === 1
+      ? `/api/traffic?metric=${encodeURIComponent(metricList[0])}`
+      : `/api/traffic?metrics=${encodeURIComponent(metricList.join(','))}`;
+
+    url += `&startTime=${encodeURIComponent(startTime)}&endTime=${encodeURIComponent(endTime)}`;
+
+    if (interval && interval !== 'auto') {
+      url += `&interval=${encodeURIComponent(interval)}`;
+    }
+    if (zoneId) {
+      url += `&zoneId=${encodeURIComponent(zoneId)}`;
+    }
+
+    const response = await fetch(url);
+    const result = await response.json();
+    if (result?.error) throw new Error(result.error);
+    return result;
+  } catch (err) {
+    console.error(`Error fetching batch metrics:`, err);
+    return null;
+  }
 }
 
 function processData(result, targetMetric) {
@@ -117,5 +163,6 @@ function processData(result, targetMetric) {
 
 export {
   fetchData,
+  fetchBatchData,
   processData,
 };
