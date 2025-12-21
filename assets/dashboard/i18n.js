@@ -463,7 +463,18 @@ export function initLanguageSwitcher(selectId = 'language') {
   const select = document.getElementById(selectId);
   if (!select) return;
   select.value = getLocale();
-  select.addEventListener('change', () => setLocale(select.value));
+  // 避免重复绑定导致 change 事件叠加触发
+  const previousHandler = select.__eoLocaleChangeHandler;
+  if (previousHandler) {
+    try {
+      select.removeEventListener('change', previousHandler);
+    } catch {
+      // ignore
+    }
+  }
+  const handler = () => setLocale(select.value);
+  select.__eoLocaleChangeHandler = handler;
+  select.addEventListener('change', handler);
 }
 
 function applyDocumentLocale() {

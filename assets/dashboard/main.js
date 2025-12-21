@@ -32,8 +32,29 @@ const THEME_EVENT_NAME = 'eo:themechange';
 let topAnalysisActivated = false;
 let topAnalysisRequestId = 0;
 
+const dashboardCache = {
+  core: null,
+  zones: null,
+  pagesBuild: null,
+  pagesCloudFunctionTrend: null,
+  pagesCloudFunctionMonthly: null,
+  topAnalysis: null,
+};
+
 function getEchartsTheme() {
   return document.documentElement.classList.contains('dark') ? 'dark' : null;
+}
+
+function getControlState() {
+  const rangeKey = document.getElementById('timeRange')?.value || '30min';
+  const interval = document.getElementById('interval')?.value || 'auto';
+  const zoneId = (document.getElementById('zoneId')?.value || '').trim();
+  return { rangeKey, interval, zoneId };
+}
+
+function isSameControlState(a, b) {
+  if (!a || !b) return false;
+  return a.rangeKey === b.rangeKey && a.interval === b.interval && a.zoneId === b.zoneId;
 }
 
 function disposeCharts(nextCharts) {
@@ -59,7 +80,7 @@ function scheduleChartsRebuild() {
       disposeCharts(charts);
       charts = initCharts(getEchartsTheme(), { includeTop: topAnalysisActivated });
       resizeCharts(charts);
-      await refreshData();
+      rerenderFromCache({ includeTop: true, includePages: true });
     })
     .finally(() => {
       rebuildPromise = null;
@@ -116,15 +137,18 @@ function loadTopAnalysisInBackground() {
 
     const topMetrics = [...metricsConfig.topAnalysis];
     const results = {};
+    const { startTime, endTime } = calculateTimeRange();
+    const controls = { ...getControlState(), startTime, endTime };
 
     await Promise.all(
       topMetrics.map(async (metric) => {
-        const res = await fetchData(metric);
+        const res = await fetchData(metric, { startTime, endTime });
         if (res) results[metric] = processData(res, metric);
       })
     );
 
     if (!charts || requestId !== topAnalysisRequestId) return;
+    dashboardCache.topAnalysis = { controls, results };
     updateTopAnalysisSection(charts, results);
   });
 }
@@ -135,53 +159,77 @@ initLanguageSwitcher('language');
 onLocaleChange(() => {
   applyTranslations();
   initLanguageSwitcher('language');
-  globalThis.refreshData?.();
+  renderZonesFromCache();
+  rerenderFromCache({ includeTop: true, includePages: true });
 });
+
+function renderZonesFromCache() {
+  const select = document.getElementById('zoneId');
+  if (!select) return;
+
+  const zones = dashboardCache.zones;
+  const currentVal = select.value;
+  select.innerHTML = '';
+
+  if (zones === null) {
+    const failOption = document.createElement('option');
+    failOption.value = '*';
+    failOption.text = t('zones.loadFailed');
+    select.appendChild(failOption);
+    select.value = '*';
+    return;
+  }
+
+  const allOption = document.createElement('option');
+  allOption.value = '*';
+  allOption.text = t('zones.all');
+  select.appendChild(allOption);
+
+  if (Array.isArray(zones) && zones.length > 0) {
+    zones.forEach((zone) => {
+      const option = document.createElement('option');
+      option.value = zone.ZoneId;
+      let text = zone.ZoneName;
+      if (text === 'default-pages-zone') {
+        text += t('zones.pagesSuffix');
+      }
+      option.text = text;
+      select.appendChild(option);
+    });
+  }
+
+  if (currentVal && Array.from(select.options).some((o) => o.value === currentVal)) {
+    select.value = currentVal;
+  } else {
+    select.value = '*';
+  }
+}
 
 async function fetchZones() {
     try {
         const response = await fetch('/api/zones');
         const result = await response.json();
 
-        const select = document.getElementById('zoneId');
-        // Keep the current selection if possible, or default to *
-        const currentVal = select.value;
-        select.innerHTML = ''; 
-
-        // Always add "All Zones" option
-        const allOption = document.createElement('option');
-        allOption.value = "*";
-        allOption.text = t('zones.all');
-        select.appendChild(allOption);
-
-        if (result.Zones && result.Zones.length > 0) {
-            result.Zones.forEach(zone => {
-                const option = document.createElement('option');
-                option.value = zone.ZoneId;
-                let text = zone.ZoneName;
-                if (text === 'default-pages-zone') {
-                    text += t('zones.pagesSuffix');
-                }
-                option.text = text;
-                select.appendChild(option);
-            });
-        }
-
-        // Restore selection if it exists in new options, otherwise default to *
-        if (currentVal && Array.from(select.options).some(o => o.value === currentVal)) {
-            select.value = currentVal;
-        } else {
-            select.value = "*";
-        }
-
+        dashboardCache.zones = Array.isArray(result?.Zones) ? result.Zones : [];
+        renderZonesFromCache();
     } catch (err) {
         console.error("Error fetching zones:", err);
-        const select = document.getElementById('zoneId');
-        // If error, ensure we have at least the default * option
-        if (select.options.length === 0 || select.options[0].value !== '*') {
-             select.innerHTML = `<option value="*">${t('zones.loadFailed')}</option>`;
-        }
+        dashboardCache.zones = null;
+        renderZonesFromCache();
     }
+}
+
+function renderPagesBuildFromCache() {
+  const cached = dashboardCache.pagesBuild;
+  if (!cached) return;
+  const current = getControlState();
+  if (cached.zoneId !== current.zoneId) return;
+
+  const { dplDailyCount, dplMonthCount } = cached;
+  document.getElementById('kpi_pages_daily_build').innerText =
+    dplDailyCount !== undefined ? Number(dplDailyCount).toLocaleString(getLocale()) : '-';
+  document.getElementById('kpi_pages_monthly_build').innerText =
+    dplMonthCount !== undefined ? Number(dplMonthCount).toLocaleString(getLocale()) : '-';
 }
 
 async function fetchPagesBuildStats() {
@@ -203,8 +251,8 @@ async function fetchPagesBuildStats() {
 
         if (result.parsedResult) {
             const { dplDailyCount, dplMonthCount } = result.parsedResult;
-            document.getElementById('kpi_pages_daily_build').innerText = dplDailyCount !== undefined ? dplDailyCount.toLocaleString(getLocale()) : '-';
-            document.getElementById('kpi_pages_monthly_build').innerText = dplMonthCount !== undefined ? dplMonthCount.toLocaleString(getLocale()) : '-';
+            dashboardCache.pagesBuild = { zoneId: zoneId || '*', dplDailyCount, dplMonthCount };
+            renderPagesBuildFromCache();
         } else {
              document.getElementById('kpi_pages_daily_build').innerText = '-';
              document.getElementById('kpi_pages_monthly_build').innerText = '-';
@@ -215,6 +263,45 @@ async function fetchPagesBuildStats() {
         document.getElementById('kpi_pages_daily_build').innerText = t('common.error');
         document.getElementById('kpi_pages_monthly_build').innerText = t('common.error');
     }
+}
+
+function renderPagesCloudFunctionTrendFromCache() {
+  const cached = dashboardCache.pagesCloudFunctionTrend;
+  if (!cached) return;
+  if (!charts?.pagesCloudFunctionRequests) return;
+
+  const current = getControlState();
+  if (cached.zoneId !== current.zoneId) return;
+
+  const { TotalValue, Timestamps, Values } = cached;
+  document.getElementById('kpi_pages_cloud_function_total').innerText =
+    TotalValue !== undefined ? formatCount(TotalValue) : '-';
+
+  if (Timestamps && Values && Timestamps.length > 0) {
+    const dates = Timestamps.map((ts) => {
+      return new Date(ts * 1000).toLocaleString(getLocale(), { month: 'numeric', day: 'numeric', hour: 'numeric', minute: 'numeric' });
+    });
+
+    const option = {
+      tooltip: { trigger: 'axis' },
+      grid: { left: '3%', right: '4%', bottom: '3%', containLabel: true },
+      xAxis: { type: 'category', boundaryGap: false, data: dates },
+      yAxis: { type: 'value' },
+      series: [
+        {
+          name: t('charts.requests'),
+          type: 'line',
+          smooth: true,
+          data: Values,
+          areaStyle: { opacity: 0.1 },
+          itemStyle: { color: '#3b82f6' },
+        },
+      ],
+    };
+    charts.pagesCloudFunctionRequests.setOption(option);
+  } else {
+    charts.pagesCloudFunctionRequests.clear();
+  }
 }
 
 async function fetchPagesCloudFunctionStats(startTime, endTime) {
@@ -238,54 +325,15 @@ async function fetchPagesCloudFunctionStats(startTime, endTime) {
         // Parsed Result: { Status, Granularity, Timestamps, Values, TotalValue }
         if (result.parsedResult) {
             const { TotalValue, Timestamps, Values } = result.parsedResult;
-
-            // Update KPI
-            document.getElementById('kpi_pages_cloud_function_total').innerText = TotalValue !== undefined ? formatCount(TotalValue) : '-';
-
-            // Update Chart
-            if (Timestamps && Values && Timestamps.length > 0) {
-                 const dates = Timestamps.map(ts => {
-                    // Timestamps are in seconds, convert to local string
-                    return new Date(ts * 1000).toLocaleString(getLocale(), { month: 'numeric', day: 'numeric', hour: 'numeric', minute: 'numeric' });
-                });
-
-                const option = {
-                    tooltip: {
-                        trigger: 'axis'
-                    },
-                    grid: {
-                        left: '3%',
-                        right: '4%',
-                        bottom: '3%',
-                        containLabel: true
-                    },
-                    xAxis: {
-                        type: 'category',
-                        boundaryGap: false,
-                        data: dates
-                    },
-                    yAxis: {
-                        type: 'value'
-                    },
-                    series: [
-                        {
-                            name: t('charts.requests'),
-                            type: 'line',
-                            smooth: true,
-                            data: Values,
-                            areaStyle: {
-                                opacity: 0.1
-                            },
-                            itemStyle: {
-                                color: '#3b82f6'
-                            }
-                        }
-                    ]
-                };
-                charts.pagesCloudFunctionRequests.setOption(option);
-            } else {
-                charts.pagesCloudFunctionRequests.clear();
-            }
+            dashboardCache.pagesCloudFunctionTrend = {
+              zoneId: zoneId || '*',
+              startTime: startTime || null,
+              endTime: endTime || null,
+              TotalValue,
+              Timestamps,
+              Values,
+            };
+            renderPagesCloudFunctionTrendFromCache();
 
         } else {
              document.getElementById('kpi_pages_cloud_function_total').innerText = '-';
@@ -296,6 +344,24 @@ async function fetchPagesCloudFunctionStats(startTime, endTime) {
         document.getElementById('kpi_pages_cloud_function_total').innerText = t('common.error');
         charts.pagesCloudFunctionRequests.clear();
     }
+}
+
+function renderPagesCloudFunctionMonthlyFromCache() {
+  const cached = dashboardCache.pagesCloudFunctionMonthly;
+  if (!cached) return;
+  const current = getControlState();
+  if (cached.zoneId !== current.zoneId) return;
+
+  const { TotalMemDuration, TotalInvocation } = cached;
+  document.getElementById('kpi_pages_monthly_cf_requests').innerText =
+    TotalInvocation !== undefined ? formatCount(TotalInvocation) : '-';
+
+  if (TotalMemDuration !== undefined) {
+    const gbs = (Number(TotalMemDuration) / 1024).toFixed(2);
+    document.getElementById('kpi_pages_monthly_cf_gbs').innerText = gbs;
+  } else {
+    document.getElementById('kpi_pages_monthly_cf_gbs').innerText = '-';
+  }
 }
 
 async function fetchPagesCloudFunctionMonthlyStats() {
@@ -311,17 +377,12 @@ async function fetchPagesCloudFunctionMonthlyStats() {
         // Expected Result: { parsedResult: { TotalMemDuration: number, TotalInvocation: number } }
         if (result.parsedResult) {
             const { TotalMemDuration, TotalInvocation } = result.parsedResult;
-
-            // Update Requests KPI
-            document.getElementById('kpi_pages_monthly_cf_requests').innerText = TotalInvocation !== undefined ? formatCount(TotalInvocation) : '-';
-
-            // Update GBs KPI (TotalMemDuration / 1024)
-            if (TotalMemDuration !== undefined) {
-                const gbs = (TotalMemDuration / 1024).toFixed(2);
-                document.getElementById('kpi_pages_monthly_cf_gbs').innerText = gbs;
-            } else {
-                document.getElementById('kpi_pages_monthly_cf_gbs').innerText = '-';
-            }
+            dashboardCache.pagesCloudFunctionMonthly = {
+              zoneId: zoneId || '*',
+              TotalMemDuration,
+              TotalInvocation,
+            };
+            renderPagesCloudFunctionMonthlyFromCache();
 
         } else {
              document.getElementById('kpi_pages_monthly_cf_requests').innerText = '-';
@@ -332,6 +393,41 @@ async function fetchPagesCloudFunctionMonthlyStats() {
         document.getElementById('kpi_pages_monthly_cf_requests').innerText = t('common.error');
         document.getElementById('kpi_pages_monthly_cf_gbs').innerText = t('common.error');
     }
+}
+
+function rerenderFromCache({ includeTop = true, includePages = true } = {}) {
+  if (!charts) return false;
+
+  hideAllKpiCompareLines();
+
+  const current = getControlState();
+
+  const core = dashboardCache.core;
+  if (core && isSameControlState(current, core.controls)) {
+    updateTrafficSection(charts, core.results, core.compareResults, core.compareEnabled);
+    updateBandwidthSection(charts, core.results, core.compareResults, core.compareEnabled);
+    updateOriginPullSection(charts, core.results, core.compareResults, core.compareEnabled);
+    updateRequestsSection(charts, core.results, core.compareResults, core.compareEnabled);
+    updatePerformanceSection(charts, core.results, core.compareResults, core.compareEnabled);
+    updateEdgeFunctionsSection(charts, core.results, core.compareResults, core.compareEnabled);
+    updateSecuritySection(charts, core.results, core.compareResults, core.compareEnabled);
+  }
+
+  if (includePages) {
+    renderPagesBuildFromCache();
+    renderPagesCloudFunctionTrendFromCache();
+    renderPagesCloudFunctionMonthlyFromCache();
+  }
+
+  if (includeTop && topAnalysisActivated) {
+    const top = dashboardCache.topAnalysis;
+    if (top && isSameControlState(current, top.controls)) {
+      ensureTopCharts(charts, getEchartsTheme());
+      updateTopAnalysisSection(charts, top.results);
+    }
+  }
+
+  return true;
 }
 
 export async function refreshData() {
@@ -352,6 +448,7 @@ export async function refreshData() {
 
     const results = {};
     const compareResults = {};
+    const controls = getControlState();
     const rangeKey = document.getElementById('timeRange')?.value || '30min';
     const compareEnabled = true;
     const prevRange = calculatePreviousTimeRange({ startTime, endTime, rangeKey });
@@ -420,6 +517,7 @@ export async function refreshData() {
     updatePerformanceSection(charts, results, compareResults, compareEnabled); //5.
     updateEdgeFunctionsSection(charts, results, compareResults, compareEnabled); // New
     updateSecuritySection(charts, results, compareResults, compareEnabled); //5.1
+    dashboardCache.core = { controls, results, compareResults, compareEnabled };
 
     // Top 分析：只在用户滚动到该区块后加载，减少首屏网络与 CPU 压力
     if (topAnalysisActivated) {
