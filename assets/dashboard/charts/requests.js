@@ -1,9 +1,10 @@
 import { getMetricLabel, metricColors, metricsConfig } from '../constants.js';
 import { getLocale } from '../i18n.js';
 import { formatCount, getBestCountUnit } from '../utils.js';
+import { updateKpiCompare } from '../compare.js';
 
 //4.有使用
-export function updateRequestsSection(charts, results) {
+export function updateRequestsSection(charts, results, compareResults, compareEnabled) {
     const locale = getLocale();
     const chartRequests = charts.requests;
     const metrics = metricsConfig.requests;
@@ -28,6 +29,7 @@ export function updateRequestsSection(charts, results) {
 
         // Update KPI
         document.getElementById(`kpi_${metric}`).innerText = formatCount(data.sum);
+        updateKpiCompare(metric, data.sum, compareResults?.[metric]?.sum, compareEnabled);
 
         if (timeData.length === 0) timeData = data.timeData;
 

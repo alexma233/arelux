@@ -65,9 +65,16 @@ const MESSAGES = {
       timeRange: '时间范围:',
       apply: '应用',
       interval: '粒度:',
+      compare: '对比:',
       zone: '选择站点:',
       intervalAuto: '自动',
       zoneLoading: '加载中...',
+    },
+    compare: {
+      off: '关闭',
+      prevPeriod: '上一周期',
+      vsPrev: '较上一周期',
+      unavailable: '不可用',
     },
     timeRange: {
       '30min': '近 30 分钟',
@@ -221,9 +228,16 @@ const MESSAGES = {
       timeRange: 'Time Range:',
       apply: 'Apply',
       interval: 'Granularity:',
+      compare: 'Compare:',
       zone: 'Zone:',
       intervalAuto: 'Auto',
       zoneLoading: 'Loading...',
+    },
+    compare: {
+      off: 'Off',
+      prevPeriod: 'Previous period',
+      vsPrev: 'vs previous',
+      unavailable: 'Unavailable',
     },
     timeRange: {
       '30min': 'Last 30 minutes',

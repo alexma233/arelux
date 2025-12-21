@@ -7,9 +7,10 @@ import {
   getBestCountUnit,
   getBestUnit,
 } from '../utils.js';
+import { updateKpiCompare } from '../compare.js';
 
 //3.有使用
-export function updateOriginPullSection(charts, results) {
+export function updateOriginPullSection(charts, results, compareResults, compareEnabled) {
     const locale = getLocale();
     const chartOriginPull = charts.originPull;
     const metrics = metricsConfig.originPull;
@@ -48,12 +49,16 @@ export function updateOriginPullSection(charts, results) {
         if (kpiEl) {
             if (metric.includes('Flux')) {
                  kpiEl.innerText = formatBytes(data.sum);
+                 updateKpiCompare(metric, data.sum, compareResults?.[metric]?.sum, compareEnabled);
             } else if (metric.includes('Bandwidth')) {
                  kpiEl.innerText = formatBps(data.max);
+                 updateKpiCompare(metric, data.max, compareResults?.[metric]?.max, compareEnabled);
             } else if (metric.includes('request')) {
                  kpiEl.innerText = formatCount(data.sum);
+                 updateKpiCompare(metric, data.sum, compareResults?.[metric]?.sum, compareEnabled);
             } else {
                  kpiEl.innerText = data.sum.toLocaleString(locale);
+                 updateKpiCompare(metric, data.sum, compareResults?.[metric]?.sum, compareEnabled);
             }
         }
 
@@ -152,4 +157,12 @@ export function updateOriginPullSection(charts, results) {
     if (hitRateEl) {
         hitRateEl.innerText = (hitRate * 100).toFixed(2) + '%';
     }
+
+    const prevOriginFlux = compareResults?.['l7Flow_inFlux_hy'];
+    const prevEdgeFlux = compareResults?.['l7Flow_outFlux'];
+    let prevHitRate = NaN;
+    if (prevOriginFlux && prevEdgeFlux && prevEdgeFlux.sum > 0) {
+      prevHitRate = 1 - (prevOriginFlux.sum / prevEdgeFlux.sum);
+    }
+    updateKpiCompare('cache_hit_rate', hitRate, prevHitRate, compareEnabled);
 }

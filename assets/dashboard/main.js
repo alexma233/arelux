@@ -4,6 +4,11 @@ import { fetchData, processData } from './api.js';
 import { calculateTimeRange, formatCount, handleTimeRangeChange } from './utils.js';
 import { initCharts, resizeCharts } from './initCharts.js';
 import {
+  calculatePreviousTimeRange,
+  hideAllKpiCompareLines,
+  isSecurityCompareAllowed,
+} from './compare.js';
+import {
   applyTranslations,
   getLocale,
   initI18n,
@@ -289,8 +294,12 @@ async function fetchPagesCloudFunctionMonthlyStats() {
 export async function refreshData() {
     if (!charts) return;
     await ensureWorldMapRegistered();
-    // Show loading
-    document.querySelectorAll('[id^="kpi_"]').forEach(el => el.innerText = t('common.loading'));
+
+    // 始终开启对比：先清空对比行，避免上一次结果残留
+    hideAllKpiCompareLines();
+
+    // Show loading（不覆盖对比行，避免出现“加载中...”闪烁）
+    document.querySelectorAll('[id^="kpi_"]:not([id^="kpi_compare_"])').forEach(el => el.innerText = t('common.loading'));
 
     // Check time range for Security Metrics
     const { startTime, endTime } = calculateTimeRange();
@@ -312,6 +321,11 @@ export async function refreshData() {
     ];
 
     const results = {};
+    const compareResults = {};
+    const rangeKey = document.getElementById('timeRange')?.value || '30min';
+    const compareEnabled = true;
+    const prevRange = calculatePreviousTimeRange({ startTime, endTime, rangeKey });
+    const securityCompareEnabled = !!prevRange && isSecurityCompareAllowed(prevRange.startTime);
 
     // Start Pages Build Stats fetch (independent)
     fetchPagesBuildStats();
@@ -320,22 +334,30 @@ export async function refreshData() {
     // Start Pages Cloud Function Monthly Stats fetch (independent)
     fetchPagesCloudFunctionMonthlyStats();
 
-    // Parallel fetch
+    // Parallel fetch（开启对比时，会额外拉取“上一周期”同口径数据）
     await Promise.all(allMetrics.map(async (metric) => {
-        const res = await fetchData(metric);
-        if (res) {
-            results[metric] = processData(res, metric);
-        }
+        const isTopMetric = metricsConfig.topAnalysis?.includes?.(metric);
+        const isSecurityMetric = metricsConfig.security?.includes?.(metric);
+        const shouldFetchCompare = !!prevRange && !isTopMetric;
+        const allowCompareForMetric = shouldFetchCompare && (!isSecurityMetric || securityCompareEnabled);
+
+        const [res, prevRes] = await Promise.all([
+          fetchData(metric),
+          allowCompareForMetric ? fetchData(metric, prevRange) : Promise.resolve(null),
+        ]);
+
+        if (res) results[metric] = processData(res, metric);
+        if (prevRes) compareResults[metric] = processData(prevRes, metric);
     }));
 
     // Update UI
-    updateTrafficSection(charts, results); //1.
-    updateBandwidthSection(charts, results); //2.
-    updateOriginPullSection(charts, results); //3.
-    updateRequestsSection(charts, results); //4.
-    updatePerformanceSection(charts, results); //5.
-    updateEdgeFunctionsSection(charts, results); // New
-    updateSecuritySection(charts, results); //5.1
+    updateTrafficSection(charts, results, compareResults, compareEnabled); //1.
+    updateBandwidthSection(charts, results, compareResults, compareEnabled); //2.
+    updateOriginPullSection(charts, results, compareResults, compareEnabled); //3.
+    updateRequestsSection(charts, results, compareResults, compareEnabled); //4.
+    updatePerformanceSection(charts, results, compareResults, compareEnabled); //5.
+    updateEdgeFunctionsSection(charts, results, compareResults, compareEnabled); // New
+    updateSecuritySection(charts, results, compareResults, compareEnabled); //5.1
     updateTopAnalysisSection(charts, results); //6.
 }
 

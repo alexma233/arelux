@@ -1,9 +1,10 @@
 import { getMetricLabel, metricColors, metricsConfig } from '../constants.js';
 import { getLocale } from '../i18n.js';
 import { formatBps, getBestUnit } from '../utils.js';
+import { updateKpiCompare } from '../compare.js';
 
 //2.有使用
-export function updateBandwidthSection(charts, results) {
+export function updateBandwidthSection(charts, results, compareResults, compareEnabled) {
     const locale = getLocale();
     const chartBandwidth = charts.bandwidth;
     const metrics = metricsConfig.bandwidth;
@@ -28,6 +29,7 @@ export function updateBandwidthSection(charts, results) {
 
         // Update KPI (Max/Peak)
         document.getElementById(`kpi_${metric}`).innerText = formatBps(data.max);
+        updateKpiCompare(metric, data.max, compareResults?.[metric]?.max, compareEnabled);
 
         if (timeData.length === 0) timeData = data.timeData;
 

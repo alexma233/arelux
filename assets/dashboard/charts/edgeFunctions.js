@@ -1,8 +1,9 @@
 import { getMetricLabel, metricColors, metricsConfig } from '../constants.js';
 import { getLocale } from '../i18n.js';
 import { formatCount, getBestCountUnit } from '../utils.js';
+import { updateKpiCompareByKpiId } from '../compare.js';
 
-export function updateEdgeFunctionsSection(charts, results) {
+export function updateEdgeFunctionsSection(charts, results, compareResults, compareEnabled) {
     const locale = getLocale();
     const chartFunctionRequests = charts.functionRequests;
     const chartFunctionCpu = charts.functionCpu;
@@ -41,6 +42,7 @@ export function updateEdgeFunctionsSection(charts, results) {
                     kpiEl.innerText = data.sum.toLocaleString(locale) + ' ms';
                 }
             }
+        updateKpiCompareByKpiId(config.kpiId, data.sum, compareResults?.[metric]?.sum, compareEnabled);
 
         // Chart
         const chart = config.chart;

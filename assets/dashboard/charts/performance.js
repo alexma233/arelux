@@ -1,8 +1,9 @@
 import { getMetricLabel, metricColors, metricsConfig } from '../constants.js';
 import { getLocale } from '../i18n.js';
+import { updateKpiCompare } from '../compare.js';
 
 //5.有使用
-export function updatePerformanceSection(charts, results) {
+export function updatePerformanceSection(charts, results, compareResults, compareEnabled) {
     const locale = getLocale();
     const chartPerformance = charts.performance;
     const metrics = metricsConfig.performance;
@@ -15,6 +16,7 @@ export function updatePerformanceSection(charts, results) {
 
         // Update KPI (Avg)
         document.getElementById(`kpi_${metric}`).innerText = data.avg.toFixed(2) + ' ms';
+        updateKpiCompare(metric, data.avg, compareResults?.[metric]?.avg, compareEnabled);
 
         if (timeData.length === 0) timeData = data.timeData;
 

@@ -1,9 +1,9 @@
 
 import { calculateTimeRange } from './utils.js';
 
-async function fetchData(metric) {
+async function fetchData(metric, rangeOverride) {
     try {
-        const { startTime, endTime } = calculateTimeRange();
+        const { startTime, endTime } = rangeOverride || calculateTimeRange();
         const interval = document.getElementById('interval').value;
         const zoneId = document.getElementById('zoneId').value.trim();
 

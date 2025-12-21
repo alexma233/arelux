@@ -1,8 +1,9 @@
 import { getMetricLabel, metricColors, metricsConfig } from '../constants.js';
 import { getLocale } from '../i18n.js';
 import { formatBytes, getBestUnit } from '../utils.js';
+import { updateKpiCompare } from '../compare.js';
 
-export function updateTrafficSection(charts, results) {
+export function updateTrafficSection(charts, results, compareResults, compareEnabled) {
     const locale = getLocale();
     const chartTraffic = charts.traffic;
     const metrics = metricsConfig.traffic;
@@ -27,6 +28,7 @@ export function updateTrafficSection(charts, results) {
 
         // Update KPI
         document.getElementById(`kpi_${metric}`).innerText = formatBytes(data.sum);
+        updateKpiCompare(metric, data.sum, compareResults?.[metric]?.sum, compareEnabled);
 
         if (timeData.length === 0) timeData = data.timeData;
 
