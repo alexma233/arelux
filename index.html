@@ -14,8 +14,12 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
-    <!-- 字体：用 <link> 替代 CSS @import，减少阻塞与额外串行依赖 -->
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
+    <!-- 字体：首屏先用系统字体；Google Fonts 用 preload 异步加载，避免阻塞渲染 -->
+    <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript>
+        <!-- 作用：无 JS 场景仍能加载字体；易错点：这会变回阻塞加载，但仅影响禁用 JS 的用户 -->
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
+    </noscript>
 
     <!-- Tailwind：改为预编译后的静态 CSS（避免运行时 CDN 阻塞渲染） -->
     <link rel="stylesheet" href="./assets/tailwind.css">

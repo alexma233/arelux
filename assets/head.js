@@ -20,3 +20,25 @@
     console.error('Error fetching config:', err);
   }
 })();
+
+// 字体策略：首屏先用系统字体；页面加载后再异步启用 Inter（不阻塞渲染）
+// 易错点：不要在这里做重计算或同步等待字体，否则会抬高 TBT
+window.addEventListener('load', () => {
+  const enableInter = () => {
+    if (!document?.fonts?.load) return;
+    document.fonts
+      .load('1em Inter')
+      .then(() => {
+        document.documentElement.classList.add('font-inter');
+      })
+      .catch(() => {
+        // ignore
+      });
+  };
+
+  if (typeof window.requestIdleCallback === 'function') {
+    window.requestIdleCallback(enableInter, { timeout: 2000 });
+  } else {
+    setTimeout(enableInter, 0);
+  }
+});
