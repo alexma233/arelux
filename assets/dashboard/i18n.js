@@ -205,7 +205,7 @@ const MESSAGES = {
     },
     footer: {
       statementHtml:
-        '由 <a href="https://github.com/afoim/eo_monitior" target="_blank" rel="noopener noreferrer" class="font-medium underline underline-offset-4 hover:text-primary">EdgeOne Monitoring Dashboard</a> 提供支持。由 <a href="https://2x.nz" target="_blank" rel="noopener noreferrer" class="font-medium underline underline-offset-4 hover:text-primary">Acofork</a> 构建，并由社区以热情持续维护。',
+        '由 <a href="https://github.com/alexma233/eo_monitior" target="_blank" rel="noopener noreferrer" class="font-medium underline underline-offset-4 hover:text-primary">EdgeOne Monitoring Dashboard</a> 提供支持。由 <a href="https://github.com/alexma233" target="_blank" rel="noopener noreferrer" class="font-medium underline underline-offset-4 hover:text-primary">alexma233</a> 构建（原作者：<a href="https://2x.nz" target="_blank" rel="noopener noreferrer" class="font-medium underline underline-offset-4 hover:text-primary">Acofork</a>），并由社区以热情持续维护。',
     },
   },
   'en-US': {
@@ -361,7 +361,7 @@ const MESSAGES = {
     },
     footer: {
       statementHtml:
-        'Powered by <a href="https://github.com/afoim/eo_monitior" target="_blank" rel="noopener noreferrer" class="font-medium underline underline-offset-4 hover:text-primary">EdgeOne Monitoring Dashboard</a>. Built by <a href="https://2x.nz" target="_blank" rel="noopener noreferrer" class="font-medium underline underline-offset-4 hover:text-primary">Acofork</a> and maintained with passion by the community.',
+        'Powered by <a href="https://github.com/alexma233/eo_monitior" target="_blank" rel="noopener noreferrer" class="font-medium underline underline-offset-4 hover:text-primary">EdgeOne Monitoring Dashboard</a>. Built by <a href="https://github.com/alexma233" target="_blank" rel="noopener noreferrer" class="font-medium underline underline-offset-4 hover:text-primary">alexma233</a> (original author: <a href="https://2x.nz" target="_blank" rel="noopener noreferrer" class="font-medium underline underline-offset-4 hover:text-primary">Acofork</a>) and maintained with passion by the community.',
     },
   },
 };
