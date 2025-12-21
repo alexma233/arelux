@@ -1,0 +1,6 @@
+/* 作用：Tailwind 预编译入口文件（生成静态 CSS，避免运行时 CDN 阻塞渲染） */
+/* 易错点：这里只声明 Tailwind 指令，不要在这里写可见文案 */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+

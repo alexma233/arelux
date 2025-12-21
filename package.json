@@ -2,10 +2,16 @@
   "name": "arelux",
   "version": "1.0.0",
   "type": "module",
+  "scripts": {
+    "build:css": "tailwindcss -c ./tailwind.config.js -i ./assets/tailwind.input.css -o ./assets/tailwind.css --minify"
+  },
   "dependencies": {
     "dotenv": "^17.2.3",
     "express": "^5.2.1",
     "tencentcloud-sdk-nodejs-common": "^4.1.122",
     "tencentcloud-sdk-nodejs-teo": "^4.1.154"
+  },
+  "devDependencies": {
+    "tailwindcss": "^3.4.17"
   }
 }
