@@ -1,0 +1,31 @@
+name: Auto sync from upstream
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "17 3 * * *"
+
+permissions:
+  contents: write
+
+jobs:
+  sync:
+    if: ${{ github.event.repository.fork }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - env:
+          UPSTREAM: https://github.com/alexma233/areluxq
+        run: |
+          git remote add upstream "$UPSTREAM" || true
+          git fetch upstream --prune
+          git checkout main
+          git reset --hard upstream/main
+          git push origin main --force-with-lease
