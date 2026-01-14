@@ -7,7 +7,10 @@
 # arelux
 
 > [!NOTE]
-> Note: This project fully supports Tencent Cloud EdgeOne Global Edition (both China and International accounts can be used directly).
+> This project evolved from [afoim/eo_monitor](https://github.com/afoim/eo_monitor)
+and incorporates several new features while enhancing maintainability.
+>
+> The original author no longer maintains this project.
 
 ### Preview
 
