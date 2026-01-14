@@ -10,7 +10,8 @@
 > Note: This project fully supports Tencent Cloud EdgeOne Global Edition (both China and International accounts can be used directly).
 
 ### Preview
-<img width="989" height="1292" alt="image" src="https://github.com/user-attachments/assets/7488cd79-df76-43f3-aab0-193dab53e56c" />
+
+<img width="1365" height="878" alt="arelux alexma top_ (1)" src="https://github.com/user-attachments/assets/2cc7ed7c-6a38-44ed-9e8b-991dfee598bb" />
 
 This is a real-time monitoring dashboard built on the Tencent Cloud EdgeOne API, designed to provide intuitive traffic and request analytics.
 
