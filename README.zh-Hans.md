@@ -7,8 +7,10 @@
 # arelux
 
 > [!NOTE]
-> 提示：本项目已全面支持腾讯云 EdgeOne 全球版（中国站与国际站账号均可直接使用）。
-
+> 本项目基于 [afoim/eo_monitor](https://github.com/afoim/eo_monitor)
+ 演变而来，融入了多个新特性，并在可维护性方面进行了提升。
+>
+> 原作者目前已不再维护该项目。
 ### 效果图
 
 <img width="1350" height="867" alt="arelux alexma top_" src="https://github.com/user-attachments/assets/0dd80cb7-d5f3-4f31-a8de-b48fc5985e0d" />
